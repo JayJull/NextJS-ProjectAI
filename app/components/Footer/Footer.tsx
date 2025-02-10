@@ -1,4 +1,5 @@
 import Image from "next/image";
+import "aos/dist/aos.css";
 
 const Footer = () => {
     const handleSubmit = (event: React.FormEvent) => {
@@ -10,7 +11,7 @@ const Footer = () => {
         className="main-footer style-three bg-cover bg-gradient-to-br from-blue-600 to-blue-900" 
         style={{ backgroundImage: "url(/background/3.png)" }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-16">          
+        <div className="max-w-7xl mx-auto px-4 py-16" data-aos='fade-up' data-aos-delay="500" data-aos-once="true">
           <div className="text-center mb-16 mt-20">
             <h2 className="text-2xl font-semibold text-white font-sans">Subscribe Our Newsletter</h2>
             <p className="text-sm text-gray-200 mb-8">We don't send spam so don't worry.</p>

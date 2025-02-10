@@ -1,8 +1,9 @@
-import Home from "./pages/Homepage/page"
+import { Layout } from "./components/Dashboard/Layout"
 
 const Index = () => {
   return (
     <>
+    <Layout/>
     </>
   )
 }

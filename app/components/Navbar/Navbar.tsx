@@ -133,12 +133,12 @@ const Navbar = () => {
       </PopoverGroup>
 
       <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-        <button
+        <a href="/"
           type="button"
           className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-10 py-3 me-36 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Get Started
-        </button>
+        </a>
       </div>
     </nav>
   );

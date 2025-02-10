@@ -136,7 +136,7 @@ const Home = () => {
   }, []);
 
   return (
-    <>
+    <>  
       <section aria-label="Header" className="relative min-h-screen">
         <div
           className="absolute inset-0 z-0"
