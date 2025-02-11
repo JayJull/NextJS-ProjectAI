@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon } from "@heroicons/react/24/outline";
@@ -64,12 +66,12 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 mx-auto flex items-center justify-between p-6 lg:px-8 z-10 ${
-        scrolled ? "bg-blue-800 fixed-header" : "bg-transparent"
-      }`}
+    className={`fixed top-0 left-0 right-0 mx-auto flex items-center justify-between p-6 lg:px-8 z-50 ${
+      scrolled ? "bg-blue-800 shadow-lg" : "bg-transparent"
+    }`}
     >
       <div className="flex lg:flex-1">
-        <a href="#" className="-m-1.5 p-1.5">          
+        <a href="/" className="-m-1.5 p-1.5">          
           <img alt="Logo" src="/AIfree.png" className="h-16 w-auto ml-20" />
         </a>
       </div>
@@ -127,13 +129,13 @@ const Navbar = () => {
         <a href="#" className="text-sm font-semibold text-white">
           Find AI
         </a>
-        <a href="#" className="text-sm font-semibold text-white">
+        <a href="/pages/About" className="text-sm font-semibold text-white">
           About
         </a>
       </PopoverGroup>
 
       <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-        <a href="/"
+        <a href="/pages/Dashboard"
           type="button"
           className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-10 py-3 me-36 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
