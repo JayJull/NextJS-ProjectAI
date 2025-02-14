@@ -126,7 +126,7 @@ const Navbar = () => {
           </PopoverPanel>
         </Popover>
 
-        <a href="#" className="text-sm font-semibold text-white">
+        <a href="/pages/ListAi" className="text-sm font-semibold text-white">
           Find AI
         </a>
         <a href="/pages/About" className="text-sm font-semibold text-white">

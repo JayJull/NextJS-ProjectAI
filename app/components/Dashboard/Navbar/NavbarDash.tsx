@@ -12,7 +12,7 @@ export const NavbarDash = ({ darkMode, toggleDarkMode, toggleSidebar }:any) => {
                         <button className="inline-flex item-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" onClick={toggleSidebar}>
                             <HiOutlineMenuAlt2 className="text-2xl" />
                         </button>
-                        <a href="#" className="flex ms-2 md:me-24">
+                        <a href="/" className="flex ms-2 md:me-24">
                             <MdSpaceDashboard className="h-8 me-3 text-xl text-violet-600" />
                             <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
                                 BigKreatifAI
