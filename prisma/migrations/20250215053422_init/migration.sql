@@ -1,4 +1,4 @@
--- CreateTable
+ww-- CreateTable
 CREATE TABLE "Kategori" (
     "id" SERIAL NOT NULL,
     "nama" TEXT NOT NULL,

@@ -5,6 +5,8 @@ import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
 import UpdateDataModal from "./components/modalUpdate";
+import { FaFileImport } from "react-icons/fa";
+import ImportModal from "./components/modalImport";
 
 interface Kategori {
   id: number;
@@ -28,19 +30,20 @@ const ProductTable = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditItem, setCurrentEditItem] = useState<AI | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      const data = await getAi();
+      setAis(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAi();
-        setAis(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -125,11 +128,26 @@ const ProductTable = () => {
             <FaPlus className="text-sm" />
             Tambah
           </button>
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg -ml-80 mr-64 flex items-center gap-2"
+          >
+            <FaFileImport className="text-sm" />
+            Import
+          </button>
 
           <AddDataModal
             isOpen={isAddModalOpen}
             onClose={handleCloseModal}
             onSubmit={handleAddProduct}
+          />
+
+          <ImportModal
+            isOpen={isImportModalOpen}
+            onClose={() => setIsImportModalOpen(false)}
+            onImportSuccess={() => {
+              fetchData();
+            }}
           />
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">

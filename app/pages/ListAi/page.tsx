@@ -1,4 +1,3 @@
-// pages/List.tsx
 'use client'
 
 import { Layout } from "@/app/components/Home/Layout";

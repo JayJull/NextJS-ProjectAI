@@ -1,6 +1,13 @@
 import { AiCardProps } from "@/app/data/ai-card";
 
 const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url }) => {
+  const getFullUrl = (url: string) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
     return (
       <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-start gap-4">
@@ -22,7 +29,7 @@ const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url })
             <p className="mt-2 text-sm text-gray-600">{deskripsi}</p>
           </div>
           <a
-            href={url}
+            href={getFullUrl(url)}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded transition-colors"

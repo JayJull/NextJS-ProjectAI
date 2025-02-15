@@ -1,6 +1,6 @@
 'use server'
+import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
-
 
 interface CreateAIData {
   name: string;
@@ -184,4 +184,54 @@ export async function deleteAi(id: number) {
     console.error('Error deleting AI:', error);
     throw new Error('Gagal menghapus data AI');
   }
+}
+
+export async function importAi(request: Request){
+try {
+  const { data } = await request.json();
+
+  // Validate the data array
+  if (!Array.isArray(data)) {
+    return NextResponse.json(
+      { error: 'Invalid data format' },
+      { status: 400 }
+    );
+  }
+
+  // Process each record
+  const results = await Promise.all(
+    data.map(async (item) => {
+      // Validate kategori exists
+      const kategori = await prisma.kategori.findUnique({
+        where: { id: item.kategoriId },
+      });
+
+      if (!kategori) {
+        throw new Error(`Kategori with ID ${item.kategoriId} not found`);
+      }
+
+      // Create the AI record
+      return prisma.ai.create({
+        data: {
+          name: item.name,
+          deskripsi: item.deskripsi,
+          url: item.url,
+          gambar: item.gambar,
+          kategoriId: item.kategoriId,
+        },
+      });
+    })
+  );
+
+  return NextResponse.json({
+    message: 'Data imported successfully',
+    count: results.length,
+  });
+} catch (error) {
+  console.error('Import error:', error);
+  return NextResponse.json(
+    { error: 'Failed to import data' },
+    { status: 500 }
+  );
+}
 }
