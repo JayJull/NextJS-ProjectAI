@@ -9,6 +9,7 @@ const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url })
   };
 
     return (
+      <a href="ListAi/deskripsi">
       <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 flex-shrink-0">
@@ -38,6 +39,7 @@ const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url })
           </a>
         </div>
       </div>
+      </a>
     );
   };
   

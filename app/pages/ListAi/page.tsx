@@ -37,14 +37,7 @@ const List: React.FC = () => {
         <div className="relative z-10">
           <div className="container mx-auto px-6 pt-48">
             <div className="max-w-4xl mx-auto text-center">
-              <h1
-                className="text-white font-sans text-5xl font-bold mb-6"
-                data-aos="fade-up"
-                data-aos-delay="500"
-                data-aos-once="true"
-              >
-                Find Your AI
-              </h1>
+              
               <p
                 className="text-lg mb-8 text-white/90"
                 data-aos="fade-up"
