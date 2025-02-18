@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image";
 import "aos/dist/aos.css";
+import { FaGooglePlay, FaApple } from "react-icons/fa6";
 
 const Footer = () => {
     const handleSubmit = (event: React.FormEvent) => {
@@ -89,7 +90,7 @@ const Footer = () => {
               <p className="text-sm text-white mb-4">Click and Get started in seconds</p>
               <div className="space-y-3">
                 <a href="#" className="flex items-center gap-3 bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors">
-                  <span className="text-2xl text-white">
+                  <span className="text-2xl text-white ml-3 flex items-center gap-4"><FaApple size={30} />
                     <i className="fab fa-apple"></i>
                   </span>
                   <div className="text-white">
@@ -98,7 +99,7 @@ const Footer = () => {
                   </div>
                 </a>
                 <a href="#" className="flex items-center gap-3 bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors">
-                  <span className="text-2xl text-white">
+                  <span className="text-2xl text-white ml-3 flex items-center gap-4"><FaGooglePlay size={30} />
                     <i className="fab fa-google-play"></i>
                   </span>
                   <div className="text-white">
