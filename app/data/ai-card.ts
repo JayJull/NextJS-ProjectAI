@@ -3,19 +3,21 @@ export interface Kategori {
     name: string;
   }
   
-  export interface AI {
+export interface AI {
     id: number;
     name: string;
     deskripsi: string;
     url: string;
+    shortLink: string | null;
     gambar: string;
     kategori: Kategori;
   }
   
-  export interface AiCardProps {
+export interface AiCardProps {
     logo: string;
     name: string;
     category: string;
     deskripsi: string;
     url: string;
+    shortLink: string;
   }

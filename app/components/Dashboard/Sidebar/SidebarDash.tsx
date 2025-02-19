@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaChartBar, FaListAlt } from "react-icons/fa"
+import { FaChartBar, FaListAlt, FaArchive } from "react-icons/fa"
 import { IoIosLogOut } from "react-icons/io"
 import Link from 'next/link'
 
@@ -22,6 +22,14 @@ export const SidebarDash = ({ isSidebarOpen }: any) => {
                         <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 hover:bg-gray-100">
                             <FaListAlt className="mr-3" />
                             <span>Manage AI</span>
+                        </div>
+                    </Link>
+                </li>
+                <li>
+                    <Link href="/pages/Dashboard/Shortlink">
+                        <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 hover:bg-gray-100">
+                            <FaArchive className="mr-3" />
+                            <span>Short Link</span>
                         </div>
                     </Link>
                 </li>

@@ -1,4 +1,4 @@
-ww-- CreateTable
+-- CreateTable
 CREATE TABLE "Kategori" (
     "id" SERIAL NOT NULL,
     "nama" TEXT NOT NULL,
@@ -12,6 +12,7 @@ CREATE TABLE "Ai" (
     "name" TEXT NOT NULL,
     "deskripsi" TEXT NOT NULL,
     "url" TEXT NOT NULL,
+    "shortLink" TEXT,
     "gambar" TEXT NOT NULL,
     "kategoriId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

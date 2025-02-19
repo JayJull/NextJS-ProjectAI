@@ -17,6 +17,7 @@ interface AI {
   name: string;
   deskripsi: string;
   url: string;
+  shortLink: string | null;
   gambar: string;
   kategori: Kategori;
 }
@@ -42,7 +43,7 @@ const ProductTable = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -196,6 +197,9 @@ const ProductTable = () => {
                   Url
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
+                  ShortLink
+                </th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
                   Gambar
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
@@ -223,6 +227,9 @@ const ProductTable = () => {
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {item.url}
+                  </td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
+                    {item.shortLink}
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {item.gambar}

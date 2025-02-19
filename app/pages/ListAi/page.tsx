@@ -85,6 +85,7 @@ const List: React.FC = () => {
                   category={tool.kategori.name}
                   deskripsi={tool.deskripsi}
                   url={tool.url}
+                  shortLink={tool.shortLink || ''}
                 />
               ))}
             </div>

@@ -24,6 +24,7 @@ model Ai {
   name String
   deskripsi String
   url String
+  shortLink String?
   gambar String
   kategoriId Int
   kategori Kategori @relation(fields: [kategoriId], references: [id])
