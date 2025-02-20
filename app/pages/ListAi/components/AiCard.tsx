@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiCardProps } from "@/app/data/ai-card";
 
-const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url, shortLink }) => {
+const AiCard: React.FC<AiCardProps> = ({ logo, name, category, shortDesc, url, shortLink }) => {
   const getDisplayLink = (shortLink?: string) => {
     if (shortLink) {
       return `/aff/${shortLink}`;
@@ -28,7 +28,7 @@ const AiCard: React.FC<AiCardProps> = ({ logo, name, category, deskripsi, url, s
               {category}
             </span>
           </div>
-          <p className="mt-2 text-sm text-gray-600">{deskripsi}</p>
+          <p className="mt-2 text-sm text-gray-600">{shortDesc}</p>
         </div>
         <a
           href={getDisplayLink(shortLink)}

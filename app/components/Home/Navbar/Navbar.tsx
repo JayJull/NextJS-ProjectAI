@@ -88,44 +88,7 @@ const Navbar = () => {
       </div>
 
       <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-        <Popover className="relative">
-          <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold text-white">
-            Product
-            <ChevronDownIcon
-              className="size-5 flex-none text-gray-400"
-              aria-hidden="true"
-            />
-          </PopoverButton>
-
-          <PopoverPanel className="absolute top-full -left-8 z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
-            <div className="p-4">
-              {products.map((item) => (
-                <div
-                  key={item.name}
-                  className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
-                >
-                  <div className="flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                    <item.icon
-                      className="size-6 text-gray-600 group-hover:text-indigo-600"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="flex-auto">
-                    <a
-                      href={item.href}
-                      className="block font-semibold text-gray-900"
-                    >
-                      {item.name}
-                      <span className="absolute inset-0" />
-                    </a>
-                    <p className="mt-1 text-gray-600">{item.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </PopoverPanel>
-        </Popover>
-
+        <a href="/" className="text-sm font-semibold text-white">Home</a>
         <a href="/pages/ListAi" className="text-sm font-semibold text-white">
           Find AI
         </a>

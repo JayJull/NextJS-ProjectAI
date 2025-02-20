@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
-import UpdateDataModal from "./components/modalUpdate";
+// import UpdateDataModal from "./components/modalUpdate";
 import { FaFileImport } from "react-icons/fa";
 import ImportModal from "./components/modalImport";
 
@@ -15,10 +15,9 @@ interface Kategori {
 interface AI {
   id: number;
   name: string;
-  deskripsi: string;
   url: string;
   shortLink: string | null;
-  gambar: string;
+  click: number;
   kategori: Kategori;
 }
 
@@ -191,16 +190,13 @@ const ProductTable = () => {
                   Nama
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Deskripsi
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
                   Url
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
                   ShortLink
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Gambar
+                  Click
                 </th>
                 <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
                   Kategori
@@ -223,16 +219,13 @@ const ProductTable = () => {
                     {item.name}
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.deskripsi}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {item.url}
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {item.shortLink}
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.gambar}
+                    {item.click}
                   </td>
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {item.kategori.name}
@@ -247,7 +240,7 @@ const ProductTable = () => {
                         Edit
                       </button>
 
-                      <UpdateDataModal
+                      {/* <UpdateDataModal
                         isOpen={isEditModalOpen}
                         onClose={() => {
                           setIsEditModalOpen(false);
@@ -255,7 +248,7 @@ const ProductTable = () => {
                         }}
                         onSubmit={handleEditSubmit}
                         currentData={currentEditItem}
-                      />
+                      /> */}
                       <button
                         onClick={() => handleDelete(item.id)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"

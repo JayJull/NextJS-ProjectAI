@@ -83,7 +83,7 @@ const List: React.FC = () => {
                   logo={tool.gambar}
                   name={tool.name}
                   category={tool.kategori.name}
-                  deskripsi={tool.deskripsi}
+                  shortDesc={tool.shortDesc}
                   url={tool.url}
                   shortLink={tool.shortLink || ''}
                 />

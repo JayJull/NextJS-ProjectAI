@@ -4,11 +4,13 @@ import { prisma } from '@/lib/prisma';
 export default async function ShortLinkPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
+
   const ai = await prisma.ai.findFirst({
     where: {
-      shortLink: params.slug,
+      shortLink: slug,
     },
     select: {
       url: true,

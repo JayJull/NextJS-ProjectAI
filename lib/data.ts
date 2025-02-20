@@ -4,22 +4,16 @@ import { prisma } from "@/lib/prisma";
 
 interface CreateAIData {
   name: string;
-  deskripsi: string;
+  shortDesc: string;
+  longDesc: string;
   url: string;
+  shortLink: string;
+  click: number;
   gambar: string;
   kategoriId: number;
 }
 
 interface UpdateAIData extends CreateAIData {
-  id: number;
-}
-
-interface CreateShortlinkData {
-  shortPath?: string;
-  originalUrl: string;
-}
-
-interface UpdateShortlinkData extends CreateShortlinkData {
   id: number;
 }
 
@@ -62,8 +56,11 @@ export async function createAi(data: CreateAIData) {
   try {
     if (
       !data.name ||
-      !data.deskripsi ||
+      !data.shortDesc ||
+      !data.longDesc ||
       !data.url ||
+      !data.shortLink ||
+      !data.click ||
       !data.gambar ||
       !data.kategoriId
     ) {
@@ -83,8 +80,11 @@ export async function createAi(data: CreateAIData) {
     const newAi = await prisma.ai.create({
       data: {
         name: data.name,
-        deskripsi: data.deskripsi,
+        shortDesc: data.shortDesc,
+        longDesc: data.longDesc,
         url: data.url,
+        shortLink: data.shortLink,
+        click: data.click,
         gambar: data.gambar,
         kategoriId: data.kategoriId,
       },
@@ -96,8 +96,11 @@ export async function createAi(data: CreateAIData) {
     return {
       id: newAi.id,
       name: newAi.name,
-      deskripsi: newAi.deskripsi,
+      shortDesc: newAi.shortDesc,
+      longDesc: newAi.longDesc,
       url: newAi.url,
+      shortLink: newAi.shortLink,
+      click: newAi.click,
       gambar: newAi.gambar,
       kategori: {
         id: newAi.kategori.id,
@@ -110,74 +113,74 @@ export async function createAi(data: CreateAIData) {
   }
 }
 
-export async function updateAi(data: UpdateAIData) {
-  try {
-    if (
-      !data.id ||
-      !data.name ||
-      !data.deskripsi ||
-      !data.url ||
-      !data.gambar ||
-      !data.kategoriId
-    ) {
-      throw new Error("Semua field harus diisi");
-    }
+// export async function updateAi(data: UpdateAIData) {
+//   try {
+//     if (
+//       !data.id ||
+//       !data.name ||
+//       !data.deskripsi ||
+//       !data.url ||
+//       !data.gambar ||
+//       !data.kategoriId
+//     ) {
+//       throw new Error("Semua field harus diisi");
+//     }
 
-    const existingAi = await prisma.ai.findUnique({
-      where: {
-        id: data.id,
-      },
-    });
+//     const existingAi = await prisma.ai.findUnique({
+//       where: {
+//         id: data.id,
+//       },
+//     });
 
-    if (!existingAi) {
-      throw new Error("Data AI tidak ditemukan");
-    }
+//     if (!existingAi) {
+//       throw new Error("Data AI tidak ditemukan");
+//     }
 
-    const kategori = await prisma.kategori.findUnique({
-      where: {
-        id: data.kategoriId,
-      },
-    });
+//     const kategori = await prisma.kategori.findUnique({
+//       where: {
+//         id: data.kategoriId,
+//       },
+//     });
 
-    if (!kategori) {
-      throw new Error("Kategori tidak ditemukan");
-    }
+//     if (!kategori) {
+//       throw new Error("Kategori tidak ditemukan");
+//     }
 
-    const updatedAi = await prisma.ai.update({
-      where: {
-        id: data.id,
-      },
-      data: {
-        name: data.name,
-        deskripsi: data.deskripsi,
-        url: data.url,
-        gambar: data.gambar,
-        kategoriId: data.kategoriId,
-      },
-      include: {
-        kategori: true,
-      },
-    });
+//     const updatedAi = await prisma.ai.update({
+//       where: {
+//         id: data.id,
+//       },
+//       data: {
+//         name: data.name,
+//         deskripsi: data.deskripsi,
+//         url: data.url,
+//         gambar: data.gambar,
+//         kategoriId: data.kategoriId,
+//       },
+//       include: {
+//         kategori: true,
+//       },
+//     });
 
-    return {
-      id: updatedAi.id,
-      name: updatedAi.name,
-      deskripsi: updatedAi.deskripsi,
-      url: updatedAi.url,
-      gambar: updatedAi.gambar,
-      kategori: {
-        id: updatedAi.kategori.id,
-        name: updatedAi.kategori.nama,
-      },
-    };
-  } catch (error) {
-    console.error("Error updating AI:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error("Gagal mengupdate data AI");
-  }
-}
+//     return {
+//       id: updatedAi.id,
+//       name: updatedAi.name,
+//       deskripsi: updatedAi.deskripsi,
+//       url: updatedAi.url,
+//       gambar: updatedAi.gambar,
+//       kategori: {
+//         id: updatedAi.kategori.id,
+//         name: updatedAi.kategori.nama,
+//       },
+//     };
+//   } catch (error) {
+//     console.error("Error updating AI:", error);
+//     if (error instanceof Error) {
+//       throw new Error(error.message);
+//     }
+//     throw new Error("Gagal mengupdate data AI");
+//   }
+// }
 
 export async function deleteAi(id: number) {
   try {
@@ -206,91 +209,48 @@ export async function deleteAi(id: number) {
   }
 }
 
-export async function importAi(request: Request) {
-  try {
-    const { data } = await request.json();
+// export async function importAi(request: Request) {
+//   try {
+//     const { data } = await request.json();
 
-    if (!Array.isArray(data)) {
-      return NextResponse.json(
-        { error: "Invalid data format" },
-        { status: 400 }
-      );
-    }
+//     if (!Array.isArray(data)) {
+//       return NextResponse.json(
+//         { error: "Invalid data format" },
+//         { status: 400 }
+//       );
+//     }
 
-    const results = await Promise.all(
-      data.map(async (item) => {
-        const kategori = await prisma.kategori.findUnique({
-          where: { id: item.kategoriId },
-        });
+//     const results = await Promise.all(
+//       data.map(async (item) => {
+//         const kategori = await prisma.kategori.findUnique({
+//           where: { id: item.kategoriId },
+//         });
 
-        if (!kategori) {
-          throw new Error(`Kategori with ID ${item.kategoriId} not found`);
-        }
+//         if (!kategori) {
+//           throw new Error(`Kategori with ID ${item.kategoriId} not found`);
+//         }
         
-        return prisma.ai.create({
-          data: {
-            name: item.name,
-            deskripsi: item.deskripsi,
-            url: item.url,
-            gambar: item.gambar,
-            kategoriId: item.kategoriId,
-          },
-        });
-      })
-    );
+//         return prisma.ai.create({
+//           data: {
+//             name: item.name,
+//             deskripsi: item.deskripsi,
+//             url: item.url,
+//             gambar: item.gambar,
+//             kategoriId: item.kategoriId,
+//           },
+//         });
+//       })
+//     );
 
-    return NextResponse.json({
-      message: "Data imported successfully",
-      count: results.length,
-    });
-  } catch (error) {
-    console.error("Import error:", error);
-    return NextResponse.json(
-      { error: "Failed to import data" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DeskripsiAi(
-  request: Request,
-  { params }: { params: { id: number } }
-) {
-  try {
-    const ai = await prisma.ai.findUnique({
-      where: {
-        id: params.id,
-      },
-    });
-    if (!ai) {
-      return NextResponse.json({ error: "AI not found" }, { status: 404 });
-    }
-    return NextResponse.json(ai);
-  } catch (error) {
-    return NextResponse.json({ error: "Error fetching AI" }, { status: 500 });
-  }
-}
-
-export async function getShortlink(
-  request: Request,
-  { params }: { params: { slug: string } }
-) {
-  try {
-    const ai = await prisma.ai.findFirst({
-      where: {
-        shortLink: params.slug,
-      },
-      select: {
-        url: true,
-      },
-    });
-
-    if (!ai) {
-      return NextResponse.redirect(new URL('/404', request.url));
-    }
-
-    return NextResponse.redirect(new URL(ai.url));
-  } catch (error) {
-    return NextResponse.redirect(new URL('/404', request.url));
-  }
-}
+//     return NextResponse.json({
+//       message: "Data imported successfully",
+//       count: results.length,
+//     });
+//   } catch (error) {
+//     console.error("Import error:", error);
+//     return NextResponse.json(
+//       { error: "Failed to import data" },
+//       { status: 500 }
+//     );
+//   }
+// }
