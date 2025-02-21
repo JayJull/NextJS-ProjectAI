@@ -4,20 +4,24 @@ import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
-// import UpdateDataModal from "./components/modalUpdate";
+import UpdateDataModal from "./components/modalUpdate";
 import { FaFileImport } from "react-icons/fa";
 import ImportModal from "./components/modalImport";
 
 interface Kategori {
   id: number;
-  name: string;
+  nama: string;
 }
+
 interface AI {
   id: number;
   name: string;
+  shortDesc: string;
+  longDesc: string;
   url: string;
   shortLink: string | null;
   click: number;
+  gambar: string;
   kategori: Kategori;
 }
 
@@ -77,18 +81,18 @@ const ProductTable = () => {
     }
   };
 
-  // Add handleEditSubmit function
   const handleEditSubmit = (updatedProduct: AI) => {
     setAis((prevAis) =>
       prevAis.map((ai) => (ai.id === updatedProduct.id ? updatedProduct : ai))
     );
+    setIsEditModalOpen(false);
+    setCurrentEditItem(null);
   };
 
   const handleDelete = async (id: number) => {
     try {
       await deleteAi(id);
       setAis((prevAis) => prevAis.filter((item) => item.id !== id));
-
       console.log("Item dengan id", id, "berhasil dihapus.");
     } catch (error) {
       console.error("Terjadi kesalahan saat menghapus item:", error);
@@ -145,9 +149,7 @@ const ProductTable = () => {
           <ImportModal
             isOpen={isImportModalOpen}
             onClose={() => setIsImportModalOpen(false)}
-            onImportSuccess={() => {
-              fetchData();
-            }}
+            onImportSuccess={fetchData}
           />
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -178,58 +180,30 @@ const ProductTable = () => {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  No
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Nama
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Url
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  ShortLink
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Click
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Kategori
-                </th>
-                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">
-                  Aksi
-                </th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">No</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">Nama</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">Url</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">ShortLink</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">Click</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">Kategori</th>
+                <th className="px-6 py-3 text-gray-600 dark:text-gray-200">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
               {paginatedData.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
                     {(currentPage - 1) * entriesPerPage + index + 1}
                   </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.name}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.url}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.shortLink}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.click}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
-                    {item.kategori.name}
-                  </td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{item.name}</td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{item.url}</td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{item.shortLink}</td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{item.click}</td>
+                  <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{item.kategori.nama}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
@@ -239,16 +213,6 @@ const ProductTable = () => {
                         <FaEdit className="text-sm" />
                         Edit
                       </button>
-
-                      {/* <UpdateDataModal
-                        isOpen={isEditModalOpen}
-                        onClose={() => {
-                          setIsEditModalOpen(false);
-                          setCurrentEditItem(null);
-                        }}
-                        onSubmit={handleEditSubmit}
-                        currentData={currentEditItem}
-                      /> */}
                       <button
                         onClick={() => handleDelete(item.id)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"
@@ -264,7 +228,6 @@ const ProductTable = () => {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="flex justify-between items-center mt-4">
           <div className="text-gray-600 dark:text-gray-300">
             Showing {(currentPage - 1) * entriesPerPage + 1} to{" "}
@@ -292,6 +255,18 @@ const ProductTable = () => {
           </div>
         </div>
       </div>
+
+      {isEditModalOpen && (
+        <UpdateDataModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setCurrentEditItem(null);
+          }}
+          onSubmit={handleEditSubmit}
+          currentData={currentEditItem}
+        />
+      )}
     </Layout>
   );
 };

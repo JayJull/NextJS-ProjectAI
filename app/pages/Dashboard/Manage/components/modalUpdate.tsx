@@ -1,200 +1,273 @@
-// import { useState, useEffect } from "react";
-// import { getKategori, updateAi } from "@/lib/data";
+import React, { useState, useEffect } from "react";
+import { X } from 'lucide-react';
+import { getKategori, updateAi } from "@/lib/data";
 
-// interface Kategori {
-//   id: number;
-//   nama: string;
-// }
+interface Kategori {
+  id: number;
+  nama: string;
+}
 
-// interface EditModalProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-//   onSubmit: (updatedProduct: any) => void;
-//   currentData: {
-//     id: number;
-//     name: string;
-//     deskripsi: string;
-//     url: string;
-//     gambar: string;
-//     kategori: {
-//       id: number;
-//       name: string;
-//     };
-//   } | null;
-// }
+interface AI {
+  id: number;
+  name: string;
+  shortDesc: string;
+  longDesc: string;
+  url: string;
+  shortLink: string | null;
+  click: number;
+  gambar: string;
+  kategori: Kategori;
+}
 
-// const EditDataModal: React.FC<EditModalProps> = ({
-//   isOpen,
-//   onClose,
-//   onSubmit,
-//   currentData,
-// }) => {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     deskripsi: "",
-//     url: "",
-//     gambar: "",
-//     kategoriId: 0,
-//   });
-//   const [categories, setCategories] = useState<Kategori[]>([]);
-//   const [error, setError] = useState("");
+interface EditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (updatedProduct: AI) => void;
+  currentData: AI | null;
+}
 
-//   useEffect(() => {
-//     if (currentData) {
-//       setFormData({
-//         name: currentData.name,
-//         deskripsi: currentData.deskripsi,
-//         url: currentData.url,
-//         gambar: currentData.gambar,
-//         kategoriId: currentData.kategori.id,
-//       });
-//     }
-//   }, [currentData]);
+const EditDataModal: React.FC<EditModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  currentData,
+}) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    shortDesc: "",
+    longDesc: "",
+    url: "",
+    shortLink: "",
+    click: 0,
+    gambar: "",
+    kategoriId: 0,
+  });
+  const [categories, setCategories] = useState<Kategori[]>([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-//   useEffect(() => {
-//     const fetchCategories = async () => {
-//       try {
-//         const data = await getKategori();
-//         setCategories(data);
-//       } catch (error) {
-//         console.error("Error fetching categories:", error);
-//         setError("Failed to load categories");
-//       }
-//     };
+  useEffect(() => {
+    if (currentData) {
+      setFormData({
+        name: currentData.name,
+        shortDesc: currentData.shortDesc,
+        longDesc: currentData.longDesc,
+        url: currentData.url,
+        shortLink: currentData.shortLink || "",
+        click: currentData.click,
+        gambar: currentData.gambar,
+        kategoriId: currentData.kategori.id,
+      });
+    }
+  }, [currentData]);
 
-//     if (isOpen) {
-//       fetchCategories();
-//     }
-//   }, [isOpen]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getKategori();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setError("Gagal mengambil data kategori");
+      }
+    };
 
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setError("");
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
 
-//     try {
-//       if (!currentData) return;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'shortDesc' && value.length > 20) return;
+    if (name === 'longDesc' && value.length > 255) return;
+    
+    if (name === 'kategoriId' && value !== '') {
+      setFormData(prev => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
-//       const updatedData = await updateAi({
-//         id: currentData.id,
-//         ...formData,
-//       });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-//       onSubmit(updatedData);
-//       onClose();
-//     } catch (error) {
-//       setError("Failed to update data");
-//       console.error("Error updating data:", error);
-//     }
-//   };
+    try {
+      if (!currentData) return;
 
-//   if (!isOpen) return null;
+      const updatedData = await updateAi({
+        id: currentData.id,
+        ...formData,
+      });
 
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
-//         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-//           Edit Data
-//         </h2>
-//         {error && (
-//           <div className="mb-4 text-red-500 text-sm">{error}</div>
-//         )}
-//         <form onSubmit={handleSubmit}>
-//           <div className="space-y-4">
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                 Nama
-//               </label>
-//               <input
-//                 type="text"
-//                 value={formData.name}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, name: e.target.value })
-//                 }
-//                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                 Deskripsi
-//               </label>
-//               <textarea
-//                 value={formData.deskripsi}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, deskripsi: e.target.value })
-//                 }
-//                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                 URL
-//               </label>
-//               <input
-//                 type="text"
-//                 value={formData.url}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, url: e.target.value })
-//                 }
-//                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                 Gambar URL
-//               </label>
-//               <input
-//                 type="text"
-//                 value={formData.gambar}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, gambar: e.target.value })
-//                 }
-//                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-//                 Kategori
-//               </label>
-//               <select
-//                 value={formData.kategoriId}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, kategoriId: Number(e.target.value) })
-//                 }
-//                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
-//                 required
-//               >
-//                 <option value="">Pilih Kategori</option>
-//                 {categories.map((category) => (
-//                   <option key={category.id} value={category.id}>
-//                     {category.nama}
-//                   </option>
-//                 ))}
-//               </select>
-//             </div>
-//           </div>
-//           <div className="mt-6 flex justify-end gap-2">
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-//             >
-//               Update
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
+      onSubmit( updatedData);
+      onClose();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Gagal mengupdate data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// export default EditDataModal;
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-xl shadow-2xl">
+        <div className="p-6 border-b dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit AI</h3>
+            <button 
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Nama
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="Nama AI"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Deskripsi Singkat ({formData.shortDesc.length}/20)
+                </label>
+                <input
+                  type="text"
+                  name="shortDesc"
+                  value={formData.shortDesc}
+                  onChange={handleChange}
+                  maxLength={20}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="Deskripsi singkat"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL
+                </label>
+                <input
+                  type="url"
+                  name="url"
+                  value={formData.url}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL Gambar
+                </label>
+                <input
+                  type="url"
+                  name="gambar"
+                  value={formData.gambar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Deskripsi Lengkap ({formData.longDesc.length}/255)
+                </label>
+                <textarea
+                  name="longDesc"
+                  value={formData.longDesc}
+                  onChange={handleChange}
+                  maxLength={255}
+                  rows={4}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent resize-none"
+                  placeholder="Deskripsi lengkap"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Link
+                </label>
+                <input
+                  type="text"
+                  name="shortLink"
+                  value={formData.shortLink}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="Short link"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Kategori
+                </label>
+                <select
+                  name="kategoriId"
+                  value={formData.kategoriId}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                >
+                  <option value="">Pilih Kategori</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.nama}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
+              disabled={loading}
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 transition-colors"
+              disabled={loading}
+            >
+              {loading ? 'Menyimpan...' : 'Simpan'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default EditDataModal;

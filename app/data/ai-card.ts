@@ -1,14 +1,16 @@
 export interface Kategori {
   id: number;
-  name: string;
+  nama: string;
 }
 
 export interface AI {
   id: number;
   name: string;
   shortDesc: string;
+  longDesc: string;
   url: string;
   shortLink: string | null;
+  click: number;
   gambar: string;
   kategori: Kategori;
 }

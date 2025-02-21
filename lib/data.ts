@@ -43,7 +43,7 @@ export async function getAi() {
       ...ai,
       kategori: {
         id: ai.kategori.id,
-        name: ai.kategori.nama,
+        nama: ai.kategori.nama,
       },
     }));
   } catch (error) {
@@ -60,11 +60,20 @@ export async function createAi(data: CreateAIData) {
       !data.longDesc ||
       !data.url ||
       !data.shortLink ||
-      !data.click ||
+      data.click === undefined ||
       !data.gambar ||
       !data.kategoriId
     ) {
       throw new Error("Semua field harus diisi");
+    }
+
+    // Validate character limits
+    if (data.shortDesc.length > 20) {
+      throw new Error("Deskripsi singkat tidak boleh lebih dari 20 karakter");
+    }
+
+    if (data.longDesc.length > 255) {
+      throw new Error("Deskripsi panjang tidak boleh lebih dari 255 karakter");
     }
 
     const kategori = await prisma.kategori.findUnique({
@@ -109,78 +118,85 @@ export async function createAi(data: CreateAIData) {
     };
   } catch (error) {
     console.error("Error creating AI:", error);
-    throw new Error("Gagal menambahkan data AI");
+    throw error; // Throw the original error for better debugging
   }
 }
 
-// export async function updateAi(data: UpdateAIData) {
-//   try {
-//     if (
-//       !data.id ||
-//       !data.name ||
-//       !data.deskripsi ||
-//       !data.url ||
-//       !data.gambar ||
-//       !data.kategoriId
-//     ) {
-//       throw new Error("Semua field harus diisi");
-//     }
+export async function updateAi(data: UpdateAIData) {
+  try {
+    if (
+      !data.name ||
+      !data.shortDesc ||
+      !data.longDesc ||
+      !data.url ||
+      !data.shortLink ||
+      data.click === undefined ||
+      !data.kategoriId
+    ) {
+      throw new Error("Semua field harus diisi");
+    }
 
-//     const existingAi = await prisma.ai.findUnique({
-//       where: {
-//         id: data.id,
-//       },
-//     });
+    const existingAi = await prisma.ai.findUnique({
+      where: {
+        id: data.id,
+      },
+    });
 
-//     if (!existingAi) {
-//       throw new Error("Data AI tidak ditemukan");
-//     }
+    if (!existingAi) {
+      throw new Error("Data AI tidak ditemukan");
+    }
 
-//     const kategori = await prisma.kategori.findUnique({
-//       where: {
-//         id: data.kategoriId,
-//       },
-//     });
+    const kategori = await prisma.kategori.findUnique({
+      where: {
+        id: data.kategoriId,
+      },
+    });
 
-//     if (!kategori) {
-//       throw new Error("Kategori tidak ditemukan");
-//     }
+    if (!kategori) {
+      throw new Error("Kategori tidak ditemukan");
+    }
 
-//     const updatedAi = await prisma.ai.update({
-//       where: {
-//         id: data.id,
-//       },
-//       data: {
-//         name: data.name,
-//         deskripsi: data.deskripsi,
-//         url: data.url,
-//         gambar: data.gambar,
-//         kategoriId: data.kategoriId,
-//       },
-//       include: {
-//         kategori: true,
-//       },
-//     });
+    const updatedAi = await prisma.ai.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        shortDesc: data.shortDesc,
+        longDesc: data.longDesc,
+        url: data.url,
+        shortLink: data.shortLink,
+        click: data.click,
+        gambar: data.gambar,
+        kategoriId: data.kategoriId,
+      },
+      include: {
+        kategori: true,
+      },
+    });
 
-//     return {
-//       id: updatedAi.id,
-//       name: updatedAi.name,
-//       deskripsi: updatedAi.deskripsi,
-//       url: updatedAi.url,
-//       gambar: updatedAi.gambar,
-//       kategori: {
-//         id: updatedAi.kategori.id,
-//         name: updatedAi.kategori.nama,
-//       },
-//     };
-//   } catch (error) {
-//     console.error("Error updating AI:", error);
-//     if (error instanceof Error) {
-//       throw new Error(error.message);
-//     }
-//     throw new Error("Gagal mengupdate data AI");
-//   }
-// }
+    return {
+      id: updatedAi.id,
+      name: updatedAi.name,
+      shortDesc: updatedAi.shortDesc,
+      longDesc: updatedAi.longDesc,
+      url: updatedAi.url,
+      shortLink: updatedAi.shortLink,
+      click: updatedAi.click,
+      gambar: updatedAi.gambar,
+      kategori: {
+        id: updatedAi.kategori.id,
+        nama: updatedAi.kategori.nama,
+      },
+    };
+  } catch (error) {
+    console.error("Error updating AI:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("Gagal mengupdate data AI");
+  }
+}
 
 export async function deleteAi(id: number) {
   try {
@@ -254,3 +270,22 @@ export async function deleteAi(id: number) {
 //     );
 //   }
 // }
+
+export async function incrementClick(shortLink: string) {
+  try {
+    await prisma.ai.updateMany({
+      where: {
+        shortLink: shortLink,
+      },
+      data: {
+        click: {
+          increment: 1,
+        },
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error incrementing click:", error);
+    return { success: false };
+  }
+}
