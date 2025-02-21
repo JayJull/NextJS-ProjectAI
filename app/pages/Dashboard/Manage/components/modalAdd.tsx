@@ -65,8 +65,8 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    if (name === 'shortDesc' && value.length > 20) return;
-    if (name === 'longDesc' && value.length > 255) return;
+    if (name === 'shortDesc' && value.length > 100) return;
+    if (name === 'longDesc' && value.length > 1588) return;
     
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -141,14 +141,14 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Singkat ({formData.shortDesc.length}/20)
+                  Deskripsi Singkat ({formData.shortDesc.length}/100)
                 </label>
                 <input
                   type="text"
                   name="shortDesc"
                   value={formData.shortDesc}
                   onChange={handleChange}
-                  maxLength={20}
+                  maxLength={100}
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                   placeholder="Deskripsi singkat"
                 />
@@ -186,13 +186,13 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Lengkap ({formData.longDesc.length}/255)
+                  Deskripsi Lengkap ({formData.longDesc.length}/1500)
                 </label>
                 <textarea
                   name="longDesc"
                   value={formData.longDesc}
                   onChange={handleChange}
-                  maxLength={255}
+                  maxLength={1500}
                   rows={4}
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent resize-none"
                   placeholder="Deskripsi lengkap"

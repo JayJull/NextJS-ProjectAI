@@ -67,13 +67,14 @@ export async function createAi(data: CreateAIData) {
       throw new Error("Semua field harus diisi");
     }
 
-    // Validate character limits
-    if (data.shortDesc.length > 20) {
-      throw new Error("Deskripsi singkat tidak boleh lebih dari 20 karakter");
+    if (data.shortDesc.length > 100) {
+      throw new Error("Deskripsi singkat tidak boleh lebih dari 100 karakter");
     }
 
-    if (data.longDesc.length > 255) {
-      throw new Error("Deskripsi panjang tidak boleh lebih dari 255 karakter");
+    if (data.longDesc.length > 15000) {
+      throw new Error(
+        "Deskripsi panjang tidak boleh lebih dari 15000 karakter"
+      );
     }
 
     const kategori = await prisma.kategori.findUnique({
@@ -118,7 +119,7 @@ export async function createAi(data: CreateAIData) {
     };
   } catch (error) {
     console.error("Error creating AI:", error);
-    throw error; // Throw the original error for better debugging
+    throw error;
   }
 }
 
@@ -225,51 +226,61 @@ export async function deleteAi(id: number) {
   }
 }
 
-// export async function importAi(request: Request) {
-//   try {
-//     const { data } = await request.json();
+export async function importAi(request: Request) {
+  try {
+    const { data } = await request.json();
 
-//     if (!Array.isArray(data)) {
-//       return NextResponse.json(
-//         { error: "Invalid data format" },
-//         { status: 400 }
-//       );
-//     }
+    if (!Array.isArray(data)) {
+      return NextResponse.json(
+        { error: "Invalid data format" },
+        { status: 400 }
+      );
+    }
 
-//     const results = await Promise.all(
-//       data.map(async (item) => {
-//         const kategori = await prisma.kategori.findUnique({
-//           where: { id: item.kategoriId },
-//         });
+    const results = await Promise.all(
+      data.map(async (item) => {
+        const shortLink =
+          item.shortLink || item.name.toLowerCase().replace(/\s+/g, "-");
+        const defaultLongDesc =
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-//         if (!kategori) {
-//           throw new Error(`Kategori with ID ${item.kategoriId} not found`);
-//         }
-        
-//         return prisma.ai.create({
-//           data: {
-//             name: item.name,
-//             deskripsi: item.deskripsi,
-//             url: item.url,
-//             gambar: item.gambar,
-//             kategoriId: item.kategoriId,
-//           },
-//         });
-//       })
-//     );
+        if (item.kategoriId) {
+          const kategori = await prisma.kategori.findUnique({
+            where: { id: item.kategoriId },
+          });
 
-//     return NextResponse.json({
-//       message: "Data imported successfully",
-//       count: results.length,
-//     });
-//   } catch (error) {
-//     console.error("Import error:", error);
-//     return NextResponse.json(
-//       { error: "Failed to import data" },
-//       { status: 500 }
-//     );
-//   }
-// }
+          if (!kategori) {
+            throw new Error(`Kategori with ID ${item.kategoriId} not found`);
+          }
+        }
+
+        return prisma.ai.create({
+          data: {
+            name: item.name,
+            shortDesc: item.shortDesc,
+            longDesc: item.longDesc || defaultLongDesc,
+            url: item.url,
+            shortLink: shortLink,
+            click: parseInt(item.click) || 0,
+            gambar: item.gambar,
+            kategoriId: item.kategoriId,
+          },
+        });
+      })
+    );
+
+    return NextResponse.json({
+      message: "Data imported successfully",
+      count: results.length,
+    });
+  } catch (error) {
+    console.error("Import error:", error);
+    return NextResponse.json(
+      { error: "Failed to import data" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function incrementClick(shortLink: string) {
   try {

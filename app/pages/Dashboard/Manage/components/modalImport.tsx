@@ -33,17 +33,49 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
       }
 
       // Get headers from first row and convert to lowercase
-      const headers = (jsonData[0] as string[]).map(header => 
-        header?.toLowerCase().trim()
+      const rawHeaders = jsonData[0] as string[];
+      const headers = rawHeaders.map(header => 
+        header?.toString().toLowerCase().trim()
       );
+      
+      console.log("Detected headers:", headers);
 
-      // Validate required columns
-      const requiredColumns = ['name', 'deskripsi', 'url', 'gambar'];
+      // Known variations for common column names
+      const headerMappings = {
+        name: ['name', 'nama', 'title', 'judul'],
+        shortDesc: ['shortdesc', 'short desc', 'short_desc', 'shortdescription', 'short description', 'description', 'desc', 'deskripsi', 'deskripsi singkat'],
+        url: ['url', 'link', 'website', 'alamat', 'address'],
+        gambar: ['gambar', 'image', 'img', 'picture', 'foto', 'photo']
+      };
+
+      // Create a mapping from actual headers to standardized names
+      const headerMap = new Map();
+      headers.forEach((header, index) => {
+        if (!header) return;
+        
+        for (const [standardName, variations] of Object.entries(headerMappings)) {
+          if (variations.includes(header)) {
+            headerMap.set(index, standardName);
+            break;
+          }
+        }
+        
+        // If not found in mappings, use the original header
+        if (!headerMap.has(index)) {
+          headerMap.set(index, header);
+        }
+      });
+
+      // Check for required columns
+      const requiredColumns = ['name', 'shortDesc', 'url', 'gambar'];
+      const foundColumns = Array.from(headerMap.values());
       const missingColumns = requiredColumns.filter(col => 
-        !headers.includes(col)
+        !foundColumns.includes(col)
       );
 
       if (missingColumns.length > 0) {
+        console.log("Found columns:", foundColumns);
+        console.log("Missing columns:", missingColumns);
         throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
       }
 
@@ -53,13 +85,27 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         .filter(row => row.some((cell: any) => cell != null && cell !== ''))
         .map((row: any) => {
           const item: any = {};
-          headers.forEach((header, index) => {
-            if (header) {
-              item[header] = row[index] || '';
+          
+          // Map data using the standardized header names
+          headerMap.forEach((standardHeader, index) => {
+            if (standardHeader === 'kategoriId') {
+              const kategoriValue = row[index];
+              item[standardHeader] = kategoriValue ? Number(kategoriValue) : 1;
+              if (isNaN(item[standardHeader])) {
+                item[standardHeader] = 1;
+              }
+            } else if (standardHeader === 'click') {
+              const clickValue = row[index];
+              item[standardHeader] = clickValue ? parseInt(clickValue) : 0;
+              if (isNaN(item[standardHeader])) {
+                item[standardHeader] = 0;
+              }
+            } else {
+              item[standardHeader] = row[index] || '';
             }
           });
-          
-          // Add kategoriId if not present
+
+          // Ensure kategoriId always exists
           if (!item.kategoriId) {
             item.kategoriId = 1;
           }
@@ -71,7 +117,8 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         throw new Error('No valid data found in the import file');
       }
 
-      // Send to API
+      console.log("Transformed data:", transformedData);
+
       const response = await fetch('/api/import', {
         method: 'POST',
         headers: {
@@ -122,7 +169,10 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
             disabled={isLoading}
           />
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Required columns: name, deskripsi, url, gambar
+            Required columns: name, shortDesc, url, gambar
+          </p>
+          <p className="mt-1 text-xs text-gray-400">
+            Common column variations are also recognized (e.g., "nama", "description", "link", "image")
           </p>
         </div>
 
