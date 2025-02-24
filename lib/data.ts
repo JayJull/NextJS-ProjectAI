@@ -300,3 +300,28 @@ export async function incrementClick(shortLink: string) {
     return { success: false };
   }
 }
+
+
+export async function getAiMostFavorite() {
+  try {
+    const ais = await prisma.ai.findMany({
+      take: 4,
+      orderBy: {
+        click: 'desc'
+      },
+      include: {
+        kategori: {
+          select: {
+            id: true,
+            nama: true,
+          }
+        },
+      },
+    });
+    
+    return ais;
+  } catch (error) {
+    console.error("Error fetching AI data:", error);
+    throw new Error("Failed to fetch AI data");
+  }
+}
