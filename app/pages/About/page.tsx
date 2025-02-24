@@ -88,14 +88,14 @@ const values = [
   }
 ];
 
-const AboutPage = ({params}) => {
+const AboutPage = () => {
+ // alert(params.shortLink)
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
   return (
     <Layout>
-      alert(params.shortLink)
       {/* Hero Section */}
       <section className="relative min-h-[100vh]">
         <div className="relative z-10">

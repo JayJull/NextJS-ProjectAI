@@ -25,7 +25,7 @@ import  Link  from "next/link";
 
     const handleDesc = async () => {
       const Router = useRouter();
-      Router.push(`/pages/Deskripsi/${shortLink.toString()}`);
+      Router.push(`/pages/About/${shortLink}`);
     }
 
     return (
@@ -35,9 +35,9 @@ import  Link  from "next/link";
             <img src={logo} alt={name} className="w-full h-full rounded-lg object-cover" />
           </div>
           <div className="flex-1">
-            <Link href={'/pages/About'}>
+            <Link href={`/pages/Deskripsi/${shortLink}`}>
             <div className="flex items-center gap-2">
-              <h3 className="font-medium text-gray-900 hover:text-blue-600 hover:underline" onClick={handleDesc}>{name}</h3>
+              <h3 className="font-medium text-gray-900 hover:text-blue-600 hover:underline">{name}</h3>
             </div>
             </Link>
             <div className="mt-1 text-sm text-gray-600">

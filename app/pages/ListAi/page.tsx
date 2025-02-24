@@ -8,6 +8,7 @@ import AiCard from "./components/AiCard";
 import { getAi } from "@/lib/data";
 import { AI } from "@/app/data/ai-card";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const List: React.FC = () => {
   const searchParams = useSearchParams();
@@ -100,6 +101,7 @@ const List: React.FC = () => {
             <div className="text-center py-10 text-red-600">{error}</div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
+              
               {filteredTools.map((tool) => (
                 <AiCard
                   key={tool.id}
