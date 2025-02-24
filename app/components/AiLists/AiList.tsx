@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookmarkIcon } from 'lucide-react';
+import { BookmarkIcon, Link } from 'lucide-react';
 import { getAiMostFavorite, getKategori } from '@/lib/data';
 
 interface Category {
@@ -8,6 +8,7 @@ interface Category {
 }
 
 interface AI {
+  shortLink: any;
   id: number;
   gambar: string;
   name: string;
@@ -23,6 +24,7 @@ interface JobCardProps {
   kategori: Category;
   url: string;
   shortDesc: string;
+  shortLink: string | "";
 }
 
 const JobCard: React.FC<JobCardProps> = ({
@@ -30,7 +32,8 @@ const JobCard: React.FC<JobCardProps> = ({
   name,
   kategori,
   url,
-  shortDesc
+  shortDesc,
+  shortLink
 }) => {
   const getCategoryType = (index: number) => {
     const types = ['primary', 'secondary', 'warning'];
@@ -50,7 +53,7 @@ const JobCard: React.FC<JobCardProps> = ({
           </div>
 
           <div>
-            <a href={url} className="font-medium text-lg text-gray-900">
+            <a href={`/pages/Deskripsi/${shortLink}`} className="font-medium text-lg text-gray-900 hover:text-blue-600 hover:underline">
               {name}
             </a>
             <p className="text-sm text-gray-600 mt-1">{shortDesc}</p>
@@ -134,6 +137,7 @@ const JobListings: React.FC = () => {
             key={ai.id}
             gambar={ai.gambar}
             name={ai.name}
+            shortLink={ai.shortLink}
             kategori={ai.kategori}
             url={ai.url}
             shortDesc={ai.shortDesc}
