@@ -14,6 +14,7 @@ import blog1 from "../../../public/blog 1.jpg";
 import blog2 from "../../../public/blog 2.jpg";
 import blog3 from "../../../public/blog 3.jpg";
 import { Layout } from "@/app/components/Home/Layout";
+import { useRouter } from "next/navigation";
 
 const categories = [
   { id: "All Categories", name: "All Categories" },
@@ -119,19 +120,29 @@ const Home = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
+  const Router = useRouter();
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setIsDropdownOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-  };
-
   useEffect(() => {
     AOS.init({ duration: 1000 }); // Inisialisasi AOS
   }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    }
+    if (selectedCategory !== "All Categories") {
+      params.set("category", selectedCategory);
+    }
+
+    Router.push(`/pages/ListAi?${params.toString()}`);
+  };
 
   return (
     <>
@@ -166,7 +177,7 @@ const Home = () => {
                   data-aos-once="true"
                 >
                   <form
-                    className=" max-w-full rounded-full overflow-hidden"
+                    className="max-w-full rounded-full overflow-hidden"
                     onSubmit={handleSubmit}
                   >
                     <div className="flex">
@@ -224,7 +235,7 @@ const Home = () => {
                           id="search-dropdown"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                          className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                           placeholder="Search Mockups, Logos, Design Templates..."
                           required
                         />
@@ -262,12 +273,13 @@ const Home = () => {
               data-aos-delay="400"
               data-aos-once="true"
             >
-              <button
+              <a
+              href="/pages/ListAi"
                 type="button"
                 className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-10 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 More!
-              </button>
+              </a>
             </div>
           </div>
         </section>
