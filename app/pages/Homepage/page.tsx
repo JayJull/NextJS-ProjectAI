@@ -96,7 +96,7 @@ const news = [
     title: "Attract Sales And Profits ",
     blogSingleTitle:
       "Attract Sales And Profits toward the sunshine - and shadows will fall behind you.",
-    link: `A job ravenously while Far much that one rank beheld after outside....`,
+    link: 'A job ravenously while Far much that one rank beheld after outside....',
   },
   {
     id: 2,
@@ -104,7 +104,7 @@ const news = [
     title: "5 Tips For Your Job Interviews",
     blogSingleTitle:
       "5 Tips For Your Job Interviews toward the sunshine - and shadows will fall behind you.",
-    link: `A job ravenously while Far much that one rank beheld after outside....`,
+    link: 'A job ravenously while Far much that one rank beheld after outside...',
   },
   {
     id: 3,
@@ -112,7 +112,7 @@ const news = [
     title: "Overworked Newspaper Editor",
     blogSingleTitle:
       "Overworked Newspaper Editor toward the sunshine - and shadows will fall behind you.",
-    link: `A job ravenously while Far much that one rank beheld after outside....`,
+    link: 'A job ravenously while Far much that one rank beheld after outside....',
   },
 ];
 
@@ -393,7 +393,7 @@ const Home = () => {
                 {/* Duplicate set for seamless loop */}
                 <div className="flex animate-marquee2 whitespace-nowrap min-w-full absolute left-full">
                   {logos.map((logo) => (
-                    <div
+                    <div                
                       key={`${logo.id}-duplicate`}
                       className="flex items-center justify-center flex-grow px-16 min-w-[200px]"
                     >
