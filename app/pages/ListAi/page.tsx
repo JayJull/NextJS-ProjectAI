@@ -55,6 +55,7 @@ const List: React.FC = () => {
 
   return (
     <Layout>
+
       <section className="relative min-h-[100vh]">
         <div className="relative z-10">
           <div className="container mx-auto px-6 pt-48">
