@@ -6,7 +6,14 @@ import Link from "next/link";
 import { Layout } from "@/app/components/Home/Layout";
 import { FaFacebookF, FaXTwitter, FaPinterestP } from "react-icons/fa6";
 //import DeskripsiPage from "../Deskripsi";
-import { incrementClick } from "@/lib/data";
+import { getAi, getAiMostFavorite, incrementClick } from "@/lib/data";
+import { Ai } from "@prisma/client";
+import { AI } from "@/app/data/ai-card";
+import AiCard from "../../ListAi/components/AiCard";
+import DeskripsiCard from "../Deskripsi";
+import "aos/dist/aos.css";
+import AOS from "aos";
+
 
 //import { url } from "inspector";
 
@@ -22,6 +29,7 @@ interface ProductData {
 const ProductPage = () => {
   const { shortLink } = useParams();
   const [product, setProduct] = useState<ProductData | null>(null);
+  const [aiTools, setAiTools] = useState<AI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,6 +80,24 @@ const ProductPage = () => {
     }
   }, [shortLink]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAiMostFavorite();
+        setAiTools(data);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching AI tools:", error);
+        setError("Failed to load AI tools");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    AOS.init({ duration: 1000 });
+  }, []);
+
   if (isLoading) {
     return (
       <Layout>
@@ -107,10 +133,10 @@ const ProductPage = () => {
       </Layout>
     );
   }
-
+  
   // Fallback image jika gambar kosong
   const imageUrl = product.gambar || "/placeholder-image.jpg";
-
+  
   return (
     <Layout>
       <section className="relative min-h-[100vh]">
@@ -143,36 +169,62 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
-      </section>
+    </section>
+
       <section>
         {/* Deskripsi Lengkap */}
-        <div className="mt-8 flex justify-left gap-3 ml-40">
-              <h2 className="text-black font-semibold">
-                Deskripsi Lengkap 
-              </h2>
+        <div className="bg-white rounded-lg p-4 ml-20 w-[80%] max-w-[1500px] mx-auto">
+          <div className="mt-4 flex justify-left gap-3 ml-10">
+            <h2 className="text-black text-2xl font-bold">Deskripsi Lengkap</h2>
           </div>
-          <div className="mt-8 flex justify-left gap-3 ml-40">
-              <p className="text-black max-w-lg">
+          <div className="flex items-start gap-4 ml-10">
+            <div className="mt-8 flex justify-left gap-3">
+              <p className="text-black text-xl text-justify leading-relaxed font-medium">
                 {product.longDesc}
               </p>
+            </div>
           </div>
+          {/* Social Share Buttons */}
+          <div className="mt-8 flex gap-3 ml-10">
+            <span className="text-black text-2xl font-bold flex items-center">
+              Share this post
+            </span>
+          </div>
+          <div className="mt-4 flex gap-3 ml-10">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
+              <FaFacebookF size={20} />
+              Facebook
+            </button>
+            <button className="bg-black text-white px-3 py-2 rounded-lg">
+              <FaXTwitter size={20} />
+            </button>
+            <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
+              <FaPinterestP size={20} />
+              Pinterest
+            </button>
+          </div>
+        </div>
+      </section>
 
-        {/* Social Share Buttons */}
-        <div className="mt-8 flex justify-left gap-3 ml-40">
-          <span className="text-black font-semibold flex items-center">
-            Share this post
-          </span>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
-            <FaFacebookF size={20} />
-            Facebook
-          </button>
-          <button className="bg-black text-white px-3 py-2 rounded-lg">
-            <FaXTwitter size={20} />
-          </button>
-          <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
-            <FaPinterestP size={20} />
-            Pinterest
-          </button>
+      <section>
+        {/* Deskripsi Lengkap */}
+        <div className="bg-white rounded-lg p-4 ml-20 w-[80%] max-w-[1500px] mt-8 mx-auto">
+          <div className="mt-4 flex justify-left gap-3 ml-10">
+            <h2 className="text-black text-2xl font-bold">Related Jobs</h2>
+          </div>
+        <div className="grid gap-4 md:grid-cols-2 mt-4 mx-10">
+          {aiTools.map((tool) => (
+            <DeskripsiCard
+            key={tool.id}
+            logo={tool.gambar}
+            name={tool.name}
+            category={tool.kategori.nama}
+            shortDesc={tool.shortDesc}
+            url={tool.url}
+            shortLink={tool.shortLink || ""}
+            />
+          ))}
+        </div>
         </div>
       </section>
     </Layout>
