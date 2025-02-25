@@ -5,17 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Layout } from "@/app/components/Home/Layout";
 import { FaFacebookF, FaXTwitter, FaPinterestP } from "react-icons/fa6";
-//import DeskripsiPage from "../Deskripsi";
-import { getAi, getAiMostFavorite, incrementClick } from "@/lib/data";
-import { Ai } from "@prisma/client";
+import { getAiMostFavorite, incrementClick } from "@/lib/data";
 import { AI } from "@/app/data/ai-card";
-import AiCard from "../../ListAi/components/AiCard";
 import DeskripsiCard from "../Deskripsi";
 import "aos/dist/aos.css";
 import AOS from "aos";
-
-
-//import { url } from "inspector";
 
 interface ProductData {
   name: string;
@@ -33,27 +27,29 @@ const ProductPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // const getDisplayLink = (shortLink?: string) => {
-  //   if (shortLink) {
-  //     return `/aff/${shortLink}`;
-  //   }
-  //   return shortLink || '/404';
-  // };
+  // Uncommented and modified to use shortLink
+  const getDisplayLink = (shortLink?: string) => {
+    if (shortLink) {
+      return `/aff/${shortLink}`;
+    }
+    return shortLink || '/404';
+  };
 
-  // const handleClick = async () => {
-  //       if (shortLink) {
-  //         try {
-  //           await incrementClick(shortLink);
-  //         } catch (error) {
-  //           console.error("Error tracking click:", error);
-  //         }
-  //       }
-  //     };
+  const handleClick = async () => {
+    if (shortLink) {
+      try {
+        const linkValue = Array.isArray(shortLink) ? shortLink[0] : shortLink;
+        await incrementClick(linkValue);
+      } catch (error) {
+        console.error("Error tracking click:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (shortLink) {
       setIsLoading(true);
-      fetch(`../api/Deskripsi/${shortLink}`)
+      fetch(`/api/Deskripsi/${shortLink}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error(res.statusText);
@@ -127,7 +123,6 @@ const ProductPage = () => {
       <Layout>
         <section className="relative min-h-[100vh]">
           <div className="container mx-auto px-6 pt-48">
-            <p className="text-white text-center">Product not found</p>
           </div>
         </section>
       </Layout>
@@ -158,8 +153,9 @@ const ProductPage = () => {
               </p>
               <div className="mt-6">
                 <Link
-                  href={product.url}
+                  href={getDisplayLink(shortLink as string)}
                   target="_blank"
+                  onClick={handleClick}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg inline-block"
                 >
                   Visit Website

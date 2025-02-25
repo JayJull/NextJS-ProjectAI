@@ -1,5 +1,3 @@
-// app/api/Deskripsi/[shortLink]/route.ts
-
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
@@ -7,9 +5,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { shortLink: string } }
+  context: { params: { shortLink: string } }
 ) {
   try {
+    const params = await context.params;
     const { shortLink } = params;
     console.log("Received shortLink:", shortLink);
 
@@ -36,7 +35,6 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Update click count
     await prisma.ai.update({
       where: { id: product.id },
       data: { click: { increment: 1 } }
