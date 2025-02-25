@@ -4,10 +4,16 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Layout } from "@/app/components/Home/Layout";
+import { FaFacebookF, FaXTwitter, FaPinterestP } from "react-icons/fa6";
+//import DeskripsiPage from "../Deskripsi";
+import { incrementClick } from "@/lib/data";
+
+//import { url } from "inspector";
 
 interface ProductData {
   name: string;
   shortDesc: string;
+  longDesc: string;
   gambar: string;
   url: string;
   kategoriId: string;
@@ -18,6 +24,23 @@ const ProductPage = () => {
   const [product, setProduct] = useState<ProductData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // const getDisplayLink = (shortLink?: string) => {
+  //   if (shortLink) {
+  //     return `/aff/${shortLink}`;
+  //   }
+  //   return shortLink || '/404';
+  // };
+
+  // const handleClick = async () => {
+  //       if (shortLink) {
+  //         try {
+  //           await incrementClick(shortLink);
+  //         } catch (error) {
+  //           console.error("Error tracking click:", error);
+  //         }
+  //       }
+  //     };
 
   useEffect(() => {
     if (shortLink) {
@@ -86,7 +109,7 @@ const ProductPage = () => {
   }
 
   // Fallback image jika gambar kosong
-  const imageUrl = product.gambar || '/placeholder-image.jpg';
+  const imageUrl = product.gambar || "/placeholder-image.jpg";
 
   return (
     <Layout>
@@ -103,15 +126,13 @@ const ProductPage = () => {
                   className="mb-4"
                 />
               )}
-              <h2 className="text-2xl text-white font-bold">
-                {product.name}
-              </h2>
+              <h2 className="text-2xl text-white font-bold">{product.name}</h2>
               <p className="text-white flex items-center gap-2 mt-2">
                 <span>📂</span> {product.kategoriId}
               </p>
               <div className="mt-6">
                 <Link
-                  href={product.url || '#'}
+                  href={product.url}
                   target="_blank"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg inline-block"
                 >
@@ -121,6 +142,37 @@ const ProductPage = () => {
               <p className="text-white mt-4">{product.shortDesc}</p>
             </div>
           </div>
+        </div>
+      </section>
+      <section>
+        {/* Deskripsi Lengkap */}
+        <div className="mt-8 flex justify-left gap-3 ml-40">
+              <h2 className="text-black font-semibold">
+                Deskripsi Lengkap 
+              </h2>
+          </div>
+          <div className="mt-8 flex justify-left gap-3 ml-40">
+              <p className="text-black max-w-lg">
+                {product.longDesc}
+              </p>
+          </div>
+
+        {/* Social Share Buttons */}
+        <div className="mt-8 flex justify-left gap-3 ml-40">
+          <span className="text-black font-semibold flex items-center">
+            Share this post
+          </span>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
+            <FaFacebookF size={20} />
+            Facebook
+          </button>
+          <button className="bg-black text-white px-3 py-2 rounded-lg">
+            <FaXTwitter size={20} />
+          </button>
+          <button className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition">
+            <FaPinterestP size={20} />
+            Pinterest
+          </button>
         </div>
       </section>
     </Layout>

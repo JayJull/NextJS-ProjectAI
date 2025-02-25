@@ -21,6 +21,7 @@ export async function GET(
         id: true,
         name: true,
         shortDesc: true,
+        longDesc: true,
         gambar: true,
         url: true,
         kategori: {
@@ -44,6 +45,7 @@ export async function GET(
     const transformedProduct = {
       name: product.name,
       shortDesc: product.shortDesc,
+      longDesc: product.longDesc,
       gambar: product.gambar,
       url: product.url,
       kategoriId: product.kategori.nama
