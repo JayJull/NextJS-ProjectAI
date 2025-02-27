@@ -31,37 +31,37 @@ const teamMembers = [
 ];
 
 const logos = [
-    {
-      id: 1,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b7.jpg",
-      alt: "Amazon",
-    },
-    {
-      id: 2,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b6.jpg",
-      alt: "Airbnb",
-    },
-    {
-      id: 3,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b4.jpg",
-      alt: "Slack",
-    },
-    {
-      id: 4,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b3.jpg",
-      alt: "PayPal",
-    },
-    {
-      id: 5,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b5.jpg",
-      alt: "Spotify",
-    },
-    {
-      id: 6,
-      src: "https://aifree.id/wp-content/uploads/2021/03/b1.jpg",
-      alt: "Figma",
-    },
-  ];
+  {
+    id: 1,
+    src: "https://www.vectorlogo.zone/logos/amazon/amazon-ar21.svg",
+    alt: "Amazon",
+  },
+  {
+    id: 2,
+    src: "https://www.vectorlogo.zone/logos/airbnb/airbnb-ar21.svg",
+    alt: "Airbnb",
+  },
+  {
+    id: 3,
+    src: "https://www.vectorlogo.zone/logos/slack/slack-ar21.svg",
+    alt: "Slack",
+  },
+  {
+    id: 4,
+    src: "https://www.vectorlogo.zone/logos/paypal/paypal-ar21.svg",
+    alt: "PayPal",
+  },
+  {
+    id: 5,
+    src: "https://www.vectorlogo.zone/logos/spotify/spotify-ar21.svg",
+    alt: "Spotify",
+  },
+  {
+    id: 6,
+    src: "https://www.vectorlogo.zone/logos/figma/figma-ar21.svg",
+    alt: "Figma",
+  },
+];
 
 const stats = [
   { id: 1, number: "25,700+", label: "AI Tools Listed" },
@@ -194,7 +194,7 @@ const AboutPage = () => {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-24 px-96 rounded-full bg-blue-900">
+      <section className="py-24 px-96 rounded-lg bg-blue-900">
         <div className="max-w-xl mx-auto px-80 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-8">
             Want to Learn More?
