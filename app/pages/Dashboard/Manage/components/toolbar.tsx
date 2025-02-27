@@ -78,24 +78,6 @@ const ToolbarPlugin = () => {
     editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
   };
 
-  const formatParagraph = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection) && !selection.isCollapsed()) {
-        $wrapNodes(selection, () => $createParagraphNode());
-      }
-    });
-  };
-  
-  const formatQuote = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection) && !selection.isCollapsed()) {
-        $wrapNodes(selection, () => $createQuoteNode());
-      }
-    });
-  };
-
   const buttonClass = "p-2 mx-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700";
   const activeButtonClass = "p-2 mx-1 rounded bg-gray-200 dark:bg-gray-700";
 
@@ -129,14 +111,6 @@ const ToolbarPlugin = () => {
       <button
         type="button"
         className={buttonClass}
-        onClick={formatParagraph}
-        aria-label="Paragraph"
-      >
-        P
-      </button>
-      <button
-        type="button"
-        className={buttonClass}
         onClick={() => formatHeading("h1")}
         aria-label="Heading 1"
       >
@@ -166,14 +140,6 @@ const ToolbarPlugin = () => {
         aria-label="Numbered List"
       >
         1. List
-      </button>
-      <button
-        type="button"
-        className={buttonClass}
-        onClick={formatQuote}
-        aria-label="blockquote"
-      >
-        "Quote"
       </button>
     </div>
   );
