@@ -1,6 +1,9 @@
 "use server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import * as bcrypt from "bcryptjs";
 
 interface CreateAIData {
   name: string;
@@ -13,9 +16,38 @@ interface CreateAIData {
   kategoriId: number;
 }
 
+interface LoginData {
+  username: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+interface SignupData {
+  username: string;
+  password: string;
+}
+
+interface LoginResult {
+  success: boolean;
+  error?: string;
+}
+
+interface SignupResult {
+  success: boolean;
+  error?: string;
+}
+
+interface AdminResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+
 interface UpdateAIData extends CreateAIData {
   id: number;
 }
+
 
 export async function getKategori() {
   try {
@@ -323,4 +355,158 @@ export async function getAiMostFavorite() {
     console.error("Error fetching AI data:", error);
     throw new Error("Failed to fetch AI data");
   }
+}
+
+export async function login(data: LoginData): Promise<LoginResult> {
+  try {
+    // Validate input
+    if (!data.username || !data.password) {
+      throw new Error("Username dan password harus diisi");
+    }
+
+    // Find user by username
+    const user = await prisma.user.findUnique({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!user) {
+      throw new Error("Username atau password salah");
+    }
+
+    // Verify password
+    const passwordMatch = await bcrypt.compare(data.password, user.password);
+    if (!passwordMatch) {
+      throw new Error("Username atau password salah");
+    }
+
+    // Set cookie with session information
+    const cookieExpires = data.rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days or 24 hours
+    
+    // Create a session token (in a real app, you would use a more secure method)
+    const sessionToken = await bcrypt.hash(user.id.toString() + Date.now().toString(), 10);
+    
+    const cookieStore = await cookies();
+    cookieStore.set("sessionToken", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: cookieExpires,
+      path: "/",
+    });
+    
+    cookieStore.set("userId", user.id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: cookieExpires,
+      path: "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Login error:", error);
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Gagal login" };
+  }
+}
+
+export async function signup(data: SignupData): Promise<SignupResult> {
+  try {
+    // Validate input
+    if (!data.username || !data.password) {
+      throw new Error("Username, email, dan password harus diisi");
+    }
+
+    // Check if username already exists
+    const existingUsername = await prisma.user.findUnique({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (existingUsername) {
+      throw new Error("Username sudah digunakan");
+    }
+
+    // Check if email already exists (you need to add email field to your Prisma schema)
+    // Assuming you have email field in your user model
+    const existingEmail = await prisma.user.findFirst({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (existingEmail) {
+      throw new Error("Email sudah terdaftar");
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Create new user
+    await prisma.user.create({
+      data: {
+        username: data.username,
+        password: hashedPassword,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Signup error:", error);
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Gagal melakukan pendaftaran" };
+  }
+}
+
+export async function logout(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete("sessionToken");
+  cookieStore.delete("userId");
+  redirect("/");
+}
+
+export async function createInitialAdmin(): Promise<AdminResult> {
+  try {
+    // Check if admin already exists
+    const existingAdmin = await prisma.user.findUnique({
+      where: {
+        username: "bigkreatif",
+      },
+    });
+
+    if (existingAdmin) {
+      return { success: true, message: "Admin user already exists" };
+    }
+
+    // Create default admin user
+    const hashedPassword = await bcrypt.hash("bk12345", 10);
+    await prisma.user.create({
+      data: {
+        username: "bigkreatif",
+        password: hashedPassword,
+      },
+    });
+
+    return { success: true, message: "Admin user created successfully" };
+  } catch (error) {
+    console.error("Error creating initial admin:", error);
+    return { success: false, error: "Failed to create admin user" };
+  }
+}
+
+export async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("sessionToken");
+  const userId = cookieStore.get("userId");
+  
+  if (!sessionToken || !userId) {
+    return false;
+  }
+  
+  return true;
 }

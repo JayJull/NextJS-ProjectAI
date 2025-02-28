@@ -1,12 +1,16 @@
 "use client";
 import { Layout } from "@/app/components/Dashboard/Layout";
 import { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaFileImport, FaFileExport } from "react-icons/fa";
 import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
 import UpdateDataModal from "./components/modalUpdate";
-import { FaFileImport } from "react-icons/fa";
 import ImportModal from "./components/modalImport";
+import dynamic from "next/dynamic";
+
+const ExportModal = dynamic(() => import("./components/modalExport"), {
+  ssr: false,
+});
 
 interface Kategori {
   id: number;
@@ -35,6 +39,7 @@ const ProductTable = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditItem, setCurrentEditItem] = useState<AI | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -125,20 +130,29 @@ const ProductTable = () => {
     <Layout>
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-          <button
-            onClick={handleOpenModal}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FaPlus className="text-sm" />
-            Tambah
-          </button>
-          <button
-            onClick={() => setIsImportModalOpen(true)}
-            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg -ml-80 mr-64 flex items-center gap-2"
-          >
-            <FaFileImport className="text-sm" />
-            Import
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleOpenModal}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaPlus className="text-sm" />
+              Tambah
+            </button>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaFileImport className="text-sm" />
+              Import
+            </button>
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaFileExport className="text-sm" />
+              Export
+            </button>
+          </div>
 
           <AddDataModal
             isOpen={isAddModalOpen}
@@ -150,6 +164,12 @@ const ProductTable = () => {
             isOpen={isImportModalOpen}
             onClose={() => setIsImportModalOpen(false)}
             onImportSuccess={fetchData}
+          />
+
+          <ExportModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            data={ais}
           />
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">

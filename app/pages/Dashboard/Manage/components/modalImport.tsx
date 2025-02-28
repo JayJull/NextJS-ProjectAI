@@ -21,18 +21,15 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         return;
       }
 
-      // Read the file
       const data = await file.arrayBuffer();
       const workbook = read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
 
-      // Check if file is empty
       if (jsonData.length === 0) {
         throw new Error('File is empty');
       }
 
-      // Get headers from first row and convert to lowercase
       const rawHeaders = jsonData[0] as string[];
       const headers = rawHeaders.map(header => 
         header?.toString().toLowerCase().trim()
@@ -40,7 +37,6 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
       
       console.log("Detected headers:", headers);
 
-      // Known variations for common column names
       const headerMappings = {
         name: ['name', 'nama', 'title', 'judul'],
         shortDesc: ['shortdesc', 'short desc', 'short_desc', 'shortdescription', 'short description', 'description', 'desc', 'deskripsi', 'deskripsi singkat'],
@@ -48,7 +44,6 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         gambar: ['gambar', 'image', 'img', 'picture', 'foto', 'photo']
       };
 
-      // Create a mapping from actual headers to standardized names
       const headerMap = new Map();
       headers.forEach((header, index) => {
         if (!header) return;
@@ -59,14 +54,13 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
             break;
           }
         }
-        
-        // If not found in mappings, use the original header
+
         if (!headerMap.has(index)) {
           headerMap.set(index, header);
         }
       });
 
-      // Check for required columns
+
       const requiredColumns = ['name', 'shortDesc', 'url', 'gambar'];
       const foundColumns = Array.from(headerMap.values());
       const missingColumns = requiredColumns.filter(col => 
@@ -105,7 +99,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
             }
           });
 
-          // Ensure kategoriId always exists
+          
           if (!item.kategoriId) {
             item.kategoriId = 1;
           }
