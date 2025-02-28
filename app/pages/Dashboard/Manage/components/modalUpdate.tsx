@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { X } from 'lucide-react';
 import { getKategori, updateAi } from "@/lib/data";
+import { X } from "lucide-react";
+import SunEditor from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 
 interface Kategori {
   id: number;
@@ -77,16 +79,35 @@ const EditDataModal: React.FC<EditModalProps> = ({
     }
   }, [isOpen]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  // SunEditor options
+  const editorOptions = {
+    buttonList: [
+      ['bold', 'italic', 'underline', 'strike', 'link'],
+      ['list', 'align', 'formatBlock'],
+      ['codeView']
+    ],
+    height: '200px',
+    width: '100%'
+  };
+
+  const handleEditorChange = (content: string) => {
+    setFormData((prev) => ({ ...prev, longDesc: content }));
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    
-    if (name === 'shortDesc' && value.length > 100) return;
-    if (name === 'longDesc' && value.length > 1500) return;
-    
-    if (name === 'kategoriId' && value !== '') {
-      setFormData(prev => ({ ...prev, [name]: Number(value) }));
+
+    if (name === "shortDesc" && value.length > 100) return;
+    if (name === "longDesc" && value.length > 1500) return;
+
+    if (name === "kategoriId" && value !== "") {
+      setFormData((prev) => ({ ...prev, [name]: Number(value) }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -103,10 +124,12 @@ const EditDataModal: React.FC<EditModalProps> = ({
         ...formData,
       });
 
-      onSubmit( updatedData);
+      onSubmit(updatedData);
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Gagal mengupdate data");
+      setError(
+        error instanceof Error ? error.message : "Gagal mengupdate data"
+      );
     } finally {
       setLoading(false);
     }
@@ -119,8 +142,10 @@ const EditDataModal: React.FC<EditModalProps> = ({
       <div className="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-xl shadow-2xl">
         <div className="p-6 border-b dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit AI</h3>
-            <button 
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Edit AI
+            </h3>
+            <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
@@ -180,52 +205,9 @@ const EditDataModal: React.FC<EditModalProps> = ({
                   placeholder="https://example.com"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL Gambar
-                </label>
-                <input
-                  type="url"
-                  name="gambar"
-                  value={formData.gambar}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Lengkap ({formData.longDesc.length}/1500)
-                </label>
-                <textarea
-                  name="longDesc"
-                  value={formData.longDesc}
-                  onChange={handleChange}
-                  maxLength={1500}
-                  rows={4}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent resize-none"
-                  placeholder="Deskripsi lengkap"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Link
-                </label>
-                <input
-                  type="text"
-                  name="shortLink"
-                  value={formData.shortLink}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Short link"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Kategori
@@ -244,6 +226,49 @@ const EditDataModal: React.FC<EditModalProps> = ({
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Link
+                </label>
+                <input
+                  type="text"
+                  name="shortLink"
+                  value={formData.shortLink}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="Short link"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL Gambar
+                </label>
+                <input
+                  type="url"
+                  name="gambar"
+                  value={formData.gambar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Deskripsi Lengkap
+            </label>
+            <SunEditor
+              setContents={formData.longDesc}
+              onChange={handleEditorChange}
+              setOptions={editorOptions}
+              placeholder="Tulis deskripsi lengkap di sini..."
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Maksimal 1500 karakter
             </div>
           </div>
 
@@ -261,7 +286,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
               className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 transition-colors"
               disabled={loading}
             >
-              {loading ? 'Menyimpan...' : 'Simpan'}
+              {loading ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
         </form>

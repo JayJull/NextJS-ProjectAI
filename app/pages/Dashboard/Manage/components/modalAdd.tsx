@@ -1,28 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { createAi, getKategori } from "@/lib/data";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import {
-  $getRoot,
-  $createParagraphNode,
-  $createTextNode,
-  EditorState,
-} from "lexical";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import ToolbarPlugin from "./toolbar"; // You'll need to create this component
+import SunEditor from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 
 interface Kategori {
   id: number;
@@ -34,34 +14,6 @@ interface AddDataModalProps {
   onClose: () => void;
   onSubmit: (newProduct: any) => void;
 }
-
-// Basic placeholder component for editor
-function Placeholder() {
-  return (
-    <div className="text-gray-400 overflow-hidden absolute text-ellipsis top-[73px] left-[15px] pointer-events-none">
-      Ketik deskripsi lengkap di sini...
-    </div>
-  );
-}
-
-// Theme setup for Lexical
-const theme = {
-  paragraph: "mb-1",
-  heading: {
-    h1: "text-2xl font-bold",
-    h2: "text-xl font-bold",
-    h3: "text-lg font-bold",
-  },
-  list: {
-    ul: "list-disc ml-5",
-    ol: "list-decimal ml-5",
-  },
-  text: {
-    bold: "font-bold",
-    italic: "italic",
-    underline: "underline",
-  },
-};
 
 const AddDataModal: React.FC<AddDataModalProps> = ({
   isOpen,
@@ -131,39 +83,38 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle rich text editor content change
-  const handleEditorChange = (editorState: EditorState) => {
-    editorState.read(() => {
-      const root = $getRoot();
-      const text = root.getTextContent();
-      setEditorCharCount(text.length);
-
-      // Only update the form data if the text is within character limits
-      if (text.length <= 1588) {
-        // Convert editor state to HTML (simplified approach - you might need a more robust solution)
-        const html = JSON.stringify(editorState.toJSON());
-        setFormData((prev) => ({ ...prev, longDesc: html }));
-      }
-    });
+  // SunEditor options
+  const editorOptions = {
+    buttonList: [
+      ['undo', 'redo'],
+      ['font', 'fontSize', 'formatBlock'],
+      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+      ['removeFormat'],
+      ['fontColor', 'hiliteColor'],
+      ['outdent', 'indent'],
+      ['align', 'list', 'lineHeight'],
+      ['table', 'link', 'image'],
+      ['fullScreen', 'showBlocks', 'codeView']
+    ],
+    height: '200px',
+    width: '100%',
+    minHeight: '150px',
+    maxHeight: '300px',
+    placeholder: 'Ketik deskripsi lengkap di sini...'
   };
 
-  const initialConfig = {
-    namespace: "MyEditor",
-    theme,
-    onError: (error: Error) => console.error(error),
-    nodes: [
-      HeadingNode,
-      QuoteNode,
-      ListNode,
-      ListItemNode,
-      CodeNode,
-      CodeHighlightNode,
-      TableNode,
-      TableCellNode,
-      TableRowNode,
-      AutoLinkNode,
-      LinkNode,
-    ],
+  // Handle SunEditor content change
+  const handleEditorChange = (content: string) => {
+    // Strip HTML tags to count characters
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content;
+    const textContent = tempDiv.textContent || tempDiv.innerText || "";
+    setEditorCharCount(textContent.length);
+
+    // Only update if within character limit
+    if (textContent.length <= 1500) {
+      setFormData((prev) => ({ ...prev, longDesc: content }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -331,25 +282,12 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                 Deskripsi Lengkap ({editorCharCount}/1500)
               </label>
               <div className="border rounded-lg overflow-hidden dark:border-gray-600 focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-600 focus-within:border-transparent">
-                <LexicalComposer initialConfig={initialConfig}>
-                  <div className="relative bg-white dark:bg-gray-800 min-h-[200px]">
-                    <ToolbarPlugin />
-                    <div className="p-4 overflow-y-auto max-h-[200px]">
-                      <RichTextPlugin
-                        contentEditable={
-                          <ContentEditable className="outline-none min-h-[150px] prose dark:prose-invert max-w-none" />
-                        }
-                        placeholder={<Placeholder />}
-                        ErrorBoundary={LexicalErrorBoundary}
-                      />
-                      <HistoryPlugin />
-                      <AutoFocusPlugin />
-                      <ListPlugin />
-                      <LinkPlugin />
-                      <OnChangePlugin onChange={handleEditorChange} />
-                    </div>
-                  </div>
-                </LexicalComposer>
+                <SunEditor
+                  setContents={formData.longDesc}
+                  onChange={handleEditorChange}
+                  setOptions={editorOptions}
+                  setDefaultStyle="font-family: inherit; font-size: 14px;"
+                />
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 Gunakan toolbar di atas untuk memformat teks
