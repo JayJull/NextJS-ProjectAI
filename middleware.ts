@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const userId = request.cookies.get('userId');
 
   // Check if the route is a protected route
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') ||
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/pages/Dashboard/Manage') ||
                            request.nextUrl.pathname.startsWith('/admin');
 
   // If accessing a protected route without being logged in, redirect to login

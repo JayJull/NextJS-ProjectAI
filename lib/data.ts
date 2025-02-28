@@ -109,6 +109,26 @@ export async function createAi(data: CreateAIData) {
       );
     }
 
+    const existingName = await prisma.ai.findUnique({
+      where: {
+        name: data.name
+      }
+    });
+
+    if (existingName) {
+      throw new Error("Nama AI sudah digunakan. Gunakan nama lain.");
+    }
+
+    const existingShortLink = await prisma.ai.findUnique({
+      where: {
+        shortLink: data.shortLink
+      }
+    });
+
+    if (existingShortLink) {
+      throw new Error("Short link sudah digunakan. Gunakan short link lain.");
+    }
+
     const kategori = await prisma.kategori.findUnique({
       where: {
         id: data.kategoriId,
@@ -151,6 +171,9 @@ export async function createAi(data: CreateAIData) {
     };
   } catch (error) {
     console.error("Error creating AI:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
     throw error;
   }
 }
@@ -177,6 +200,34 @@ export async function updateAi(data: UpdateAIData) {
 
     if (!existingAi) {
       throw new Error("Data AI tidak ditemukan");
+    }
+
+    // Check if the name has changed
+    if (existingAi.name !== data.name) {
+      // Check if the new name is already in use by another record
+      const existingName = await prisma.ai.findUnique({
+        where: {
+          name: data.name
+        }
+      });
+
+      if (existingName && existingName.id !== data.id) {
+        throw new Error("Nama AI sudah digunakan. Gunakan nama lain.");
+      }
+    }
+
+    // Check if the shortLink has changed
+    if (existingAi.shortLink !== data.shortLink) {
+      // Check if the new shortLink is already in use by another record
+      const existingShortLink = await prisma.ai.findUnique({
+        where: {
+          shortLink: data.shortLink
+        }
+      });
+
+      if (existingShortLink && existingShortLink.id !== data.id) {
+        throw new Error("Short link sudah digunakan. Gunakan short link lain.");
+      }
     }
 
     const kategori = await prisma.kategori.findUnique({
@@ -269,12 +320,31 @@ export async function importAi(request: Request) {
       );
     }
 
-    const results = await Promise.all(
+    const results = {
+      imported: 0,
+      skipped: 0,
+      skippedItems: [] as string[]
+    };
+
+    await Promise.all(
       data.map(async (item) => {
-        const shortLink =
-          item.shortLink || item.name.toLowerCase().replace(/\s+/g, "-");
+        const name = item.name;
+        const shortLink = item.shortLink || item.name.toLowerCase().replace(/\s+/g, "-");
         const defaultLongDesc =
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+        const existingWithName = await prisma.ai.findUnique({
+          where: { name: name }
+        });
+        
+        const existingWithShortLink = await prisma.ai.findUnique({
+          where: { shortLink: shortLink }
+        });
+        
+        if (existingWithName || existingWithShortLink) {
+          results.skipped++;
+          results.skippedItems.push(name);
+          return null;
+        }
 
         if (item.kategoriId) {
           const kategori = await prisma.kategori.findUnique({
@@ -286,29 +356,34 @@ export async function importAi(request: Request) {
           }
         }
 
-        return prisma.ai.create({
+        const newItem = await prisma.ai.create({
           data: {
-            name: item.name,
+            name: name,
             shortDesc: item.shortDesc,
             longDesc: item.longDesc || defaultLongDesc,
             url: item.url,
             shortLink: shortLink,
             click: parseInt(item.click) || 0,
             gambar: item.gambar,
-            kategoriId: item.kategoriId,
+            kategoriId: item.kategoriId || 1,
           },
         });
+        
+        results.imported++;
+        return newItem;
       })
     );
 
     return NextResponse.json({
-      message: "Data imported successfully",
-      count: results.length,
+      message: "Import completed",
+      imported: results.imported,
+      skipped: results.skipped,
+      skippedItems: results.skippedItems
     });
   } catch (error) {
     console.error("Import error:", error);
     return NextResponse.json(
-      { error: "Failed to import data" },
+      { error: error instanceof Error ? error.message : "Failed to import data" },
       { status: 500 }
     );
   }

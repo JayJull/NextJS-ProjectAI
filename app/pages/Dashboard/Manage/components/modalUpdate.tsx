@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from 'lucide-react';
-import { getKategori, updateAi } from "@/lib/data";
+import { getKategori, updateAi, getAi } from "@/lib/data";
 
 interface Kategori {
   id: number;
@@ -45,6 +45,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
   const [categories, setCategories] = useState<Kategori[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [allAiData, setAllAiData] = useState<AI[]>([]);
 
   useEffect(() => {
     if (currentData) {
@@ -62,18 +63,22 @@ const EditDataModal: React.FC<EditModalProps> = ({
   }, [currentData]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getKategori();
-        setCategories(data);
+        const [categoriesData, aiData] = await Promise.all([
+          getKategori(),
+          getAi()
+        ]);
+        setCategories(categoriesData);
+        setAllAiData(aiData);
       } catch (error) {
-        console.error("Error fetching categories:", error);
-        setError("Gagal mengambil data kategori");
+        console.error("Error fetching data:", error);
+        setError("Gagal mengambil data");
       }
     };
 
     if (isOpen) {
-      fetchCategories();
+      fetchData();
     }
   }, [isOpen]);
 
@@ -85,14 +90,34 @@ const EditDataModal: React.FC<EditModalProps> = ({
     
     if (name === 'kategoriId' && value !== '') {
       setFormData(prev => ({ ...prev, [name]: Number(value) }));
+    } else if (name === 'shortLink') {
+      const formattedValue = value.replace(/\s+/g, '-');
+      setFormData(prev => ({ ...prev, [name]: formattedValue }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
+  const checkDuplicateShortLink = (): boolean => {
+    if (!formData.shortLink || formData.shortLink.trim() === "") return false;
+    
+    const duplicate = allAiData.find(
+      ai => ai.shortLink === formData.shortLink && ai.id !== currentData?.id
+    );
+    
+    return !!duplicate;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // Check for duplicate shortLink
+    if (checkDuplicateShortLink()) {
+      setError("Short link ini sudah digunakan. Mohon gunakan short link yang lain.");
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -103,7 +128,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
         ...formData,
       });
 
-      onSubmit( updatedData);
+      onSubmit(updatedData);
       onClose();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Gagal mengupdate data");
@@ -222,8 +247,13 @@ const EditDataModal: React.FC<EditModalProps> = ({
                   value={formData.shortLink}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Short link"
+                  placeholder="Short link (spasi akan otomatis menjadi tanda -)"
                 />
+                {formData.shortLink && checkDuplicateShortLink() && (
+                  <p className="mt-1 text-sm text-red-600">
+                    Short link ini sudah digunakan. Mohon gunakan short link yang lain.
+                  </p>
+                )}
               </div>
 
               <div>

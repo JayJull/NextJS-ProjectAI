@@ -6,6 +6,7 @@ import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
 import UpdateDataModal from "./components/modalUpdate";
 import ImportModal from "./components/modalImport";
+import DeleteConfirmationModal from "./components/modaDelete";
 import dynamic from "next/dynamic";
 
 const ExportModal = dynamic(() => import("./components/modalExport"), {
@@ -40,6 +41,8 @@ const ProductTable = () => {
   const [currentEditItem, setCurrentEditItem] = useState<AI | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{id: number, name: string} | null>(null);
 
   const fetchData = async () => {
     try {
@@ -94,13 +97,23 @@ const ProductTable = () => {
     setCurrentEditItem(null);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteClick = (id: number, name: string) => {
+    setItemToDelete({ id, name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    
     try {
-      await deleteAi(id);
-      setAis((prevAis) => prevAis.filter((item) => item.id !== id));
-      console.log("Item dengan id", id, "berhasil dihapus.");
+      await deleteAi(itemToDelete.id);
+      setAis((prevAis) => prevAis.filter((item) => item.id !== itemToDelete.id));
+      console.log("Item dengan id", itemToDelete.id, "berhasil dihapus.");
     } catch (error) {
       console.error("Terjadi kesalahan saat menghapus item:", error);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -234,7 +247,7 @@ const ProductTable = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => handleDeleteClick(item.id, item.name)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"
                       >
                         <FaTrash className="text-sm" />
@@ -287,6 +300,13 @@ const ProductTable = () => {
           currentData={currentEditItem}
         />
       )}
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={itemToDelete?.name || ""}
+      />
     </Layout>
   );
 };

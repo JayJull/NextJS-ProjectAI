@@ -10,10 +10,16 @@ interface ImportModalProps {
 
 const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [importResults, setImportResults] = useState<{
+    imported: number;
+    skipped: number;
+    skippedItems: string[];
+  } | null>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setIsLoading(true);
+      setImportResults(null);
       const file = event.target.files?.[0];
       
       if (!file) {
@@ -73,7 +79,6 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
       }
 
-      // Convert to array of objects with proper column mapping
       const rows = jsonData.slice(1) as any[];
       const transformedData = rows
         .filter(row => row.some((cell: any) => cell != null && cell !== ''))
@@ -126,9 +131,18 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
         throw new Error(errorData.message || 'Failed to import data');
       }
 
-      toast.success(`Successfully imported ${transformedData.length} items`);
-      onImportSuccess();
-      onClose();
+      const result = await response.json();
+      setImportResults({
+        imported: result.imported,
+        skipped: result.skipped,
+        skippedItems: result.skippedItems || []
+      });
+
+      toast.success(`Import completed: ${result.imported} items imported, ${result.skipped} items skipped (duplicates)`);
+      
+      if (result.imported > 0) {
+        onImportSuccess();
+      }
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to import data');
@@ -141,7 +155,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
           Import Data
         </h2>
@@ -168,7 +182,33 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
           <p className="mt-1 text-xs text-gray-400">
             Common column variations are also recognized (e.g., "nama", "description", "link", "image")
           </p>
+          <p className="mt-1 text-xs text-gray-400">
+            Duplicate entries will be skipped (based on name or shortLink)
+          </p>
         </div>
+
+        {importResults && (
+          <div className="mt-4 mb-4 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+            <h3 className="font-medium text-gray-800 dark:text-gray-200">Import Results:</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              ✅ {importResults.imported} items imported successfully
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              ⚠️ {importResults.skipped} duplicate items skipped
+            </p>
+            
+            {importResults.skipped > 0 && importResults.skippedItems.length > 0 && (
+              <div className="mt-2">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Skipped items:</p>
+                <div className="mt-1 max-h-32 overflow-y-auto text-xs text-gray-500 dark:text-gray-400">
+                  {importResults.skippedItems.map((item, index) => (
+                    <div key={index} className="mb-1">• {item}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-4 flex justify-end gap-2">
           <button
@@ -176,7 +216,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }: ImportModalProps) => 
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             disabled={isLoading}
           >
-            Cancel
+            {importResults ? 'Close' : 'Cancel'}
           </button>
         </div>
 

@@ -25,6 +25,14 @@ export const SidebarDash = ({ isSidebarOpen }: any) => {
                         </div>
                     </Link>
                 </li>
+                <li>
+                    <Link href="/pages/Dashboard/addUser">
+                        <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 hover:bg-gray-100">
+                            <FaListAlt className="mr-3" />
+                            <span>Add User</span>
+                        </div>
+                    </Link>
+                </li>
             </ul>
 
             {/* Bagian Sign Out di bawah */}

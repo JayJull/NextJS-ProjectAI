@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertCircle, Info } from 'lucide-react';
 import { createAi, getKategori } from '@/lib/data';
 
 interface Kategori {
@@ -53,6 +53,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
   }, [isOpen]);
 
   useEffect(() => {
+    // Update shortLink when name changes
     if (formData.name) {
       const formatted = formData.name.toLowerCase()
         .replace(/\s+/g, '-')
@@ -64,28 +65,36 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'shortDesc' && value.length > 100) return;
     if (name === 'longDesc' && value.length > 1588) return;
     
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle submit logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const requiredFields = ['name', 'shortDesc', 'longDesc', 'url', 'gambar', 'kategoriId'];
+      const requiredFields = ['name', 'shortDesc', 'longDesc', 'url', 'shortLink', 'gambar', 'kategoriId'];
       const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
-      
+
       if (missingFields.length > 0) {
         throw new Error('Semua field harus diisi');
       }
 
+      // Ensure shortLink is sanitized correctly
+      const sanitizedShortLink = formData.shortLink.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .substring(0, 50);
+
       const newProduct = await createAi({
         ...formData,
+        shortLink: sanitizedShortLink,
         click: 0,
         kategoriId: parseInt(formData.kategoriId)
       });
@@ -118,8 +127,9 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
         <form onSubmit={handleSubmit} className="p-6">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-start">
+              <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
@@ -127,21 +137,24 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Nama
+                  Nama <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Nama AI"
-                />
+                <div>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                    placeholder="Nama AI"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Nama harus unik dan belum pernah digunakan sebelumnya.</p>
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Singkat ({formData.shortDesc.length}/100)
+                  Deskripsi Singkat ({formData.shortDesc.length}/100) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -156,7 +169,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL
+                  URL <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="url"
@@ -170,7 +183,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL Gambar
+                  URL Gambar <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="url"
@@ -186,7 +199,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Lengkap ({formData.longDesc.length}/1500)
+                  Deskripsi Lengkap ({formData.longDesc.length}/1500) <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="longDesc"
@@ -201,20 +214,32 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Link
+                  Short Link <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="shortLink"
-                  value={formData.shortLink}
-                  readOnly
-                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="shortLink"
+                    value={formData.shortLink}
+                    readOnly
+                    className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent bg-gray-50"
+                    placeholder="example-shortLink"
+                  />
+                  <button
+                    type="button"
+                    disabled
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    title="Regenerate from name"
+                  >
+                    <Info className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Short link harus unik dan belum pernah digunakan sebelumnya.</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Kategori
+                  Kategori <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="kategoriId"
