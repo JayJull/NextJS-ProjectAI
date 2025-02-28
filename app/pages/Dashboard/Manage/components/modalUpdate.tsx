@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getKategori, updateAi, getAi  } from "@/lib/data";
+import { getKategori, updateAi, getAi } from "@/lib/data";
 import { X } from "lucide-react";
-import SunEditor from 'suneditor-react';
-import 'suneditor/dist/css/suneditor.min.css';
+import SunEditor from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css";
 
 interface Kategori {
   id: number;
@@ -70,7 +70,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
       try {
         const [categoriesData, aiData] = await Promise.all([
           getKategori(),
-          getAi()
+          getAi(),
         ]);
         setCategories(categoriesData);
         setAllAiData(aiData);
@@ -88,23 +88,23 @@ const EditDataModal: React.FC<EditModalProps> = ({
   // SunEditor options
   const editorOptions = {
     buttonList: [
-      ['undo', 'redo'],
-      ['font', 'fontSize', 'formatBlock'],
-      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-      ['removeFormat'],
-      ['fontColor', 'hiliteColor'],
-      ['outdent', 'indent'],
-      ['align', 'list', 'lineHeight'],
-      ['table', 'link', 'image'],
-      ['fullScreen', 'showBlocks', 'codeView']
+      ["undo", "redo"],
+      ["font", "fontSize", "formatBlock"],
+      ["bold", "underline", "italic", "strike", "subscript", "superscript"],
+      ["removeFormat"],
+      ["fontColor", "hiliteColor"],
+      ["outdent", "indent"],
+      ["align", "list", "lineHeight"],
+      ["table", "link", "image"],
+      ["fullScreen", "showBlocks", "codeView"],
     ],
-    height: '200px',
-    width: '100%',
-    minHeight: '150px',
-    maxHeight: '300px',
-    placeholder: 'Ketik deskripsi lengkap di sini...'
+    height: "200px",
+    width: "100%",
+    minHeight: "150px",
+    maxHeight: "300px",
+    placeholder: "Ketik deskripsi lengkap di sini...",
   };
-  
+
   const handleEditorChange = (content: string) => {
     setFormData((prev) => ({ ...prev, longDesc: content }));
   };
@@ -120,9 +120,9 @@ const EditDataModal: React.FC<EditModalProps> = ({
 
     if (name === "kategoriId" && value !== "") {
       setFormData((prev) => ({ ...prev, [name]: Number(value) }));
-    } else if (name === 'shortLink') {
-      const formattedValue = value.replace(/\s+/g, '-');
-      setFormData(prev => ({ ...prev, [name]: formattedValue }));
+    } else if (name === "shortLink") {
+      const formattedValue = value.replace(/\s+/g, "-");
+      setFormData((prev) => ({ ...prev, [name]: formattedValue }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -130,24 +130,26 @@ const EditDataModal: React.FC<EditModalProps> = ({
 
   const checkDuplicateShortLink = (): boolean => {
     if (!formData.shortLink || formData.shortLink.trim() === "") return false;
-    
+
     const duplicate = allAiData.find(
-      ai => ai.shortLink === formData.shortLink && ai.id !== currentData?.id
+      (ai) => ai.shortLink === formData.shortLink && ai.id !== currentData?.id
     );
-    
+
     return !!duplicate;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     // Check for duplicate shortLink
     if (checkDuplicateShortLink()) {
-      setError("Short link ini sudah digunakan. Mohon gunakan short link yang lain.");
+      setError(
+        "Short link ini sudah digunakan. Mohon gunakan short link yang lain."
+      );
       return;
     }
-    
+
     setLoading(true);
 
     try {
@@ -213,6 +215,19 @@ const EditDataModal: React.FC<EditModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL
+                </label>
+                <input
+                  type="url"
+                  name="url"
+                  value={formData.url}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Deskripsi Singkat ({formData.shortDesc.length}/100)
                 </label>
                 <input
@@ -225,23 +240,22 @@ const EditDataModal: React.FC<EditModalProps> = ({
                   placeholder="Deskripsi singkat"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL
-                </label>
-                <input
-                  type="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="https://example.com"
-                />
-              </div>
             </div>
 
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL Gambar
+                </label>
+                <input
+                  type="url"
+                  name="gambar"
+                  value={formData.gambar}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Kategori
@@ -260,7 +274,6 @@ const EditDataModal: React.FC<EditModalProps> = ({
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Short Link
@@ -275,23 +288,10 @@ const EditDataModal: React.FC<EditModalProps> = ({
                 />
                 {formData.shortLink && checkDuplicateShortLink() && (
                   <p className="mt-1 text-sm text-red-600">
-                    Short link ini sudah digunakan. Mohon gunakan short link yang lain.
+                    Short link ini sudah digunakan. Mohon gunakan short link
+                    yang lain.
                   </p>
                 )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL Gambar
-                </label>
-                <input
-                  type="url"
-                  name="gambar"
-                  value={formData.gambar}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="https://example.com/image.jpg"
-                />
               </div>
             </div>
           </div>
