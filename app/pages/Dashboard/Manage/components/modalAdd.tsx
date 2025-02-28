@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { AlertCircle, X } from "lucide-react";
 import { createAi, getKategori } from "@/lib/data";
-import SunEditor from 'suneditor-react';
-import 'suneditor/dist/css/suneditor.min.css';
+import SunEditor from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css";
 
 interface Kategori {
   id: number;
@@ -87,21 +87,21 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
   // SunEditor options
   const editorOptions = {
     buttonList: [
-      ['undo', 'redo'],
-      ['font', 'fontSize', 'formatBlock'],
-      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-      ['removeFormat'],
-      ['fontColor', 'hiliteColor'],
-      ['outdent', 'indent'],
-      ['align', 'list', 'lineHeight'],
-      ['table', 'link', 'image'],
-      ['fullScreen', 'showBlocks', 'codeView']
+      ["undo", "redo"],
+      ["font", "fontSize", "formatBlock"],
+      ["bold", "underline", "italic", "strike", "subscript", "superscript"],
+      ["removeFormat"],
+      ["fontColor", "hiliteColor"],
+      ["outdent", "indent"],
+      ["align", "list", "lineHeight"],
+      ["table", "link", "image"],
+      ["fullScreen", "showBlocks", "codeView"],
     ],
-    height: '200px',
-    width: '100%',
-    minHeight: '150px',
-    maxHeight: '300px',
-    placeholder: 'Ketik deskripsi lengkap di sini...'
+    height: "200px",
+    width: "100%",
+    minHeight: "150px",
+    maxHeight: "300px",
+    placeholder: "Ketik deskripsi lengkap di sini...",
   };
 
   // Handle SunEditor content change
@@ -123,17 +123,28 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
     setLoading(true);
 
     try {
-      const requiredFields = ['name', 'shortDesc', 'longDesc', 'url', 'shortLink', 'gambar', 'kategoriId'];
-      const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+      const requiredFields = [
+        "name",
+        "shortDesc",
+        "longDesc",
+        "url",
+        "shortLink",
+        "gambar",
+        "kategoriId",
+      ];
+      const missingFields = requiredFields.filter(
+        (field) => !formData[field as keyof typeof formData]
+      );
 
       if (missingFields.length > 0) {
         throw new Error("Semua field harus diisi");
       }
 
       // Ensure shortLink is sanitized correctly
-      const sanitizedShortLink = formData.shortLink.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
+      const sanitizedShortLink = formData.shortLink
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
         .substring(0, 50);
 
       const newProduct = await createAi({
@@ -195,23 +206,10 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                     className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                     placeholder="Nama AI"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Nama harus unik dan belum pernah digunakan sebelumnya.</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Nama harus unik dan belum pernah digunakan sebelumnya.
+                  </p>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Singkat ({formData.shortDesc.length}/500)
-                </label>
-                <input
-                  type="text"
-                  name="shortDesc"
-                  value={formData.shortDesc}
-                  onChange={handleChange}
-                  maxLength={500}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Deskripsi singkat"
-                />
               </div>
 
               <div>
@@ -226,8 +224,28 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                   placeholder="https://example.com"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  URL harus unik dan belum pernah digunakan sebelumnya.
+                </p>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Deskripsi Singkat ({formData.shortDesc.length}/500)
+                </label>
+                <input
+                  type="text"
+                  name="shortDesc"
+                  value={formData.shortDesc}
+                  onChange={handleChange}
+                  maxLength={500}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="Deskripsi singkat"
+                />
+              </div>
+            </div>
 
+            {/* Kolom Kanan */}
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   URL Gambar <span className="text-red-500">*</span>
@@ -240,26 +258,12 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                   placeholder="https://example.com/image.jpg"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  URL Gambar harus unik dan belum pernah digunakan sebelumnya.
+                </p>
               </div>
-            </div>
-
-            {/* Kolom Kanan */}
-            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Link
-                </label>
-                <input
-                  type="text"
-                  name="shortLink"
-                  value={formData.shortLink}
-                  readOnly
-                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   Kategori <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -275,9 +279,22 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                     </option>
                   ))}
                 </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Kategori harus unik dan belum pernah digunakan sebelumnya.
+                </p>
               </div>
-
-              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Link
+                </label>
+                <input
+                  type="text"
+                  name="shortLink"
+                  value={formData.shortLink}
+                  readOnly
+                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                />
+              </div>
             </div>
 
             {/* Kolom Lebar untuk Deskripsi */}
