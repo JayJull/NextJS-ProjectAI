@@ -78,7 +78,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "shortDesc" && value.length > 100) return;
+    if (name === "shortDesc" && value.length > 500) return;
 
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -112,9 +112,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
     setEditorCharCount(textContent.length);
 
     // Only update if within character limit
-    if (textContent.length <= 1500) {
-      setFormData((prev) => ({ ...prev, longDesc: content }));
-    }
+    setFormData((prev) => ({ ...prev, longDesc: content }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -199,14 +197,14 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Singkat ({formData.shortDesc.length}/100)
+                  Deskripsi Singkat ({formData.shortDesc.length}/500)
                 </label>
                 <input
                   type="text"
                   name="shortDesc"
                   value={formData.shortDesc}
                   onChange={handleChange}
-                  maxLength={100}
+                  maxLength={500}
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                   placeholder="Deskripsi singkat"
                 />
@@ -278,15 +276,15 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
 
             {/* Kolom Lebar untuk Deskripsi */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Deskripsi Lengkap ({editorCharCount}/1500)
+              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Deskripsi Lengkap
               </label>
               <div className="border rounded-lg overflow-hidden dark:border-gray-600 focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-600 focus-within:border-transparent">
                 <SunEditor
                   setContents={formData.longDesc}
                   onChange={handleEditorChange}
                   setOptions={editorOptions}
-                  setDefaultStyle="font-family: inherit; font-size: 14px;"
+                  setDefaultStyle="font-family: sans-serif; font-size: 14px;"
                 />
               </div>
               <div className="text-xs text-gray-500 mt-1">

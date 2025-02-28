@@ -47,6 +47,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
   const [categories, setCategories] = useState<Kategori[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editorCharCount, setEditorCharCount] = useState(0);
 
   useEffect(() => {
     if (currentData) {
@@ -76,20 +77,30 @@ const EditDataModal: React.FC<EditModalProps> = ({
 
     if (isOpen) {
       fetchCategories();
+      setEditorCharCount(0);
     }
   }, [isOpen]);
 
   // SunEditor options
   const editorOptions = {
     buttonList: [
-      ['bold', 'italic', 'underline', 'strike', 'link'],
-      ['list', 'align', 'formatBlock'],
-      ['codeView']
+      ['undo', 'redo'],
+      ['font', 'fontSize', 'formatBlock'],
+      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+      ['removeFormat'],
+      ['fontColor', 'hiliteColor'],
+      ['outdent', 'indent'],
+      ['align', 'list', 'lineHeight'],
+      ['table', 'link', 'image'],
+      ['fullScreen', 'showBlocks', 'codeView']
     ],
     height: '200px',
-    width: '100%'
+    width: '100%',
+    minHeight: '150px',
+    maxHeight: '300px',
+    placeholder: 'Ketik deskripsi lengkap di sini...'
   };
-
+  
   const handleEditorChange = (content: string) => {
     setFormData((prev) => ({ ...prev, longDesc: content }));
   };
@@ -268,7 +279,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
               placeholder="Tulis deskripsi lengkap di sini..."
             />
             <div className="text-xs text-gray-500 mt-1">
-              Maksimal 1500 karakter
+              Gunakan Toolbar Diatas | Maksimal 1500 karakter
             </div>
           </div>
 
