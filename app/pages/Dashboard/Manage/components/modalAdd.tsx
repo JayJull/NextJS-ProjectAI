@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { createAi, getKategori } from "@/lib/data";
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
@@ -136,12 +136,6 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
         .replace(/[^a-z0-9-]/g, '')
         .substring(0, 50);
 
-      // Ensure shortLink is sanitized correctly
-      const sanitizedShortLink = formData.shortLink.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
-        .substring(0, 50);
-
       const newProduct = await createAi({
         ...formData,
         shortLink: sanitizedShortLink,
@@ -253,21 +247,6 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Lengkap ({formData.longDesc.length}/1500)
-                </label>
-                <textarea
-                  name="longDesc"
-                  value={formData.longDesc}
-                  onChange={handleChange}
-                  maxLength={1500}
-                  rows={4}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent resize-none"
-                  placeholder="Deskripsi lengkap"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Short Link
                 </label>
                 <input
@@ -298,32 +277,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  URL
-                </label>
-                <input
-                  type="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                  placeholder="https://example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Link
-                </label>
-                <input
-                  type="text"
-                  name="shortLink"
-                  value={formData.shortLink}
-                  readOnly
-                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                />
-              </div>
+              
             </div>
 
             {/* Kolom Lebar untuk Deskripsi */}
