@@ -112,8 +112,7 @@ const EditDataModal: React.FC<EditModalProps> = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "shortDesc" && value.length > 100) return;
-    if (name === "longDesc" && value.length > 1500) return;
+    if (name === "shortDesc" && value.length > 500) return;
 
     if (name === "kategoriId" && value !== "") {
       setFormData((prev) => ({ ...prev, [name]: Number(value) }));

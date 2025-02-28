@@ -276,7 +276,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
 
             {/* Kolom Lebar untuk Deskripsi */}
             <div className="col-span-2">
-              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2 mt-1">
                 Deskripsi Lengkap
               </label>
               <div className="border rounded-lg overflow-hidden dark:border-gray-600 focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-600 focus-within:border-transparent">
@@ -285,10 +285,11 @@ const AddDataModal: React.FC<AddDataModalProps> = ({
                   onChange={handleEditorChange}
                   setOptions={editorOptions}
                   setDefaultStyle="font-family: sans-serif; font-size: 14px;"
+                  placeholder="Ketik Deskripsi Lengkap Disini"
                 />
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Gunakan toolbar di atas untuk memformat teks
+              <div className="text-xs text-gray-500 mt-3">
+                *Gunakan toolbar di atas untuk memformat teks
               </div>
             </div>
           </div>
