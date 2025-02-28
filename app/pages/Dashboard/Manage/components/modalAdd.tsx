@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, Info } from 'lucide-react';
-import { createAi, getKategori } from '@/lib/data';
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { createAi, getKategori } from "@/lib/data";
+import SunEditor from 'suneditor-react';
+import 'suneditor/dist/css/suneditor.min.css';
 
 interface Kategori {
   id: number;
@@ -13,19 +15,24 @@ interface AddDataModalProps {
   onSubmit: (newProduct: any) => void;
 }
 
-const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const AddDataModal: React.FC<AddDataModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}) => {
   const [formData, setFormData] = useState({
-    name: '',
-    shortDesc: '',
-    longDesc: '',
-    url: '',
-    shortLink: '',
-    gambar: '',
-    kategoriId: ''
+    name: "",
+    shortDesc: "",
+    longDesc: "",
+    url: "",
+    shortLink: "",
+    gambar: "",
+    kategoriId: "",
   });
   const [categories, setCategories] = useState<Kategori[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editorCharCount, setEditorCharCount] = useState(0);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -33,49 +40,86 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
         const data = await getKategori();
         setCategories(data);
       } catch (error) {
-        setError('Gagal mengambil data kategori');
+        setError("Gagal mengambil data kategori");
       }
     };
 
     if (isOpen) {
       fetchCategories();
       setFormData({
-        name: '',
-        shortDesc: '',
-        longDesc: '',
-        url: '',
-        shortLink: '',
-        gambar: '',
-        kategoriId: ''
+        name: "",
+        shortDesc: "",
+        longDesc: "",
+        url: "",
+        shortLink: "",
+        gambar: "",
+        kategoriId: "",
       });
-      setError('');
+      setEditorCharCount(0);
+      setError("");
     }
   }, [isOpen]);
 
   useEffect(() => {
     // Update shortLink when name changes
     if (formData.name) {
-      const formatted = formData.name.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
+      const formatted = formData.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
         .substring(0, 50);
-      setFormData(prev => ({ ...prev, shortLink: formatted }));
+      setFormData((prev) => ({ ...prev, shortLink: formatted }));
     }
   }, [formData.name]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
 
-    if (name === 'shortDesc' && value.length > 100) return;
-    if (name === 'longDesc' && value.length > 1588) return;
-    
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === "shortDesc" && value.length > 500) return;
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // SunEditor options
+  const editorOptions = {
+    buttonList: [
+      ['undo', 'redo'],
+      ['font', 'fontSize', 'formatBlock'],
+      ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+      ['removeFormat'],
+      ['fontColor', 'hiliteColor'],
+      ['outdent', 'indent'],
+      ['align', 'list', 'lineHeight'],
+      ['table', 'link', 'image'],
+      ['fullScreen', 'showBlocks', 'codeView']
+    ],
+    height: '200px',
+    width: '100%',
+    minHeight: '150px',
+    maxHeight: '300px',
+    placeholder: 'Ketik deskripsi lengkap di sini...'
+  };
+
+  // Handle SunEditor content change
+  const handleEditorChange = (content: string) => {
+    // Strip HTML tags to count characters
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content;
+    const textContent = tempDiv.textContent || tempDiv.innerText || "";
+    setEditorCharCount(textContent.length);
+
+    // Only update if within character limit
+    setFormData((prev) => ({ ...prev, longDesc: content }));
   };
 
   // Handle submit logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -83,8 +127,14 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
       const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
 
       if (missingFields.length > 0) {
-        throw new Error('Semua field harus diisi');
+        throw new Error("Semua field harus diisi");
       }
+
+      // Ensure shortLink is sanitized correctly
+      const sanitizedShortLink = formData.shortLink.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .substring(0, 50);
 
       // Ensure shortLink is sanitized correctly
       const sanitizedShortLink = formData.shortLink.toLowerCase()
@@ -96,13 +146,13 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
         ...formData,
         shortLink: sanitizedShortLink,
         click: 0,
-        kategoriId: parseInt(formData.kategoriId)
+        kategoriId: parseInt(formData.kategoriId),
       });
 
       onSubmit(newProduct);
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Terjadi kesalahan');
+      setError(error instanceof Error ? error.message : "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
@@ -115,8 +165,10 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
       <div className="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-xl shadow-2xl">
         <div className="p-6 border-b dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Tambah AI</h3>
-            <button 
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Tambah AI
+            </h3>
+            <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
@@ -134,6 +186,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
           )}
 
           <div className="grid grid-cols-2 gap-6">
+            {/* Kolom Kiri */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -154,14 +207,14 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Singkat ({formData.shortDesc.length}/100) <span className="text-red-500">*</span>
+                  Deskripsi Singkat ({formData.shortDesc.length}/500)
                 </label>
                 <input
                   type="text"
                   name="shortDesc"
                   value={formData.shortDesc}
                   onChange={handleChange}
-                  maxLength={100}
+                  maxLength={500}
                   className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
                   placeholder="Deskripsi singkat"
                 />
@@ -196,10 +249,11 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
               </div>
             </div>
 
+            {/* Kolom Kanan */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Deskripsi Lengkap ({formData.longDesc.length}/1500) <span className="text-red-500">*</span>
+                  Deskripsi Lengkap ({formData.longDesc.length}/1500)
                 </label>
                 <textarea
                   name="longDesc"
@@ -214,27 +268,15 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Link <span className="text-red-500">*</span>
+                  Short Link
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="shortLink"
-                    value={formData.shortLink}
-                    readOnly
-                    className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent bg-gray-50"
-                    placeholder="example-shortLink"
-                  />
-                  <button
-                    type="button"
-                    disabled
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                    title="Regenerate from name"
-                  >
-                    <Info className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Short link harus unik dan belum pernah digunakan sebelumnya.</p>
+                <input
+                  type="text"
+                  name="shortLink"
+                  value={formData.shortLink}
+                  readOnly
+                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                />
               </div>
 
               <div>
@@ -255,6 +297,52 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL
+                </label>
+                <input
+                  type="url"
+                  name="url"
+                  value={formData.url}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Link
+                </label>
+                <input
+                  type="text"
+                  name="shortLink"
+                  value={formData.shortLink}
+                  readOnly
+                  className="w-full px-4 py-2.5 border rounded-lg bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                />
+              </div>
+            </div>
+
+            {/* Kolom Lebar untuk Deskripsi */}
+            <div className="col-span-2">
+              <label className="block text-md font-medium text-gray-700 dark:text-gray-300 mb-2 mt-1">
+                Deskripsi Lengkap
+              </label>
+              <div className="border rounded-lg overflow-hidden dark:border-gray-600 focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-600 focus-within:border-transparent">
+                <SunEditor
+                  setContents={formData.longDesc}
+                  onChange={handleEditorChange}
+                  setOptions={editorOptions}
+                  setDefaultStyle="font-family: sans-serif; font-size: 14px;"
+                  placeholder="Ketik Deskripsi Lengkap Disini"
+                />
+              </div>
+              <div className="text-xs text-gray-500 mt-3">
+                *Gunakan toolbar di atas untuk memformat teks
+              </div>
             </div>
           </div>
 
@@ -272,7 +360,7 @@ const AddDataModal: React.FC<AddDataModalProps> = ({ isOpen, onClose, onSubmit }
               className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 transition-colors"
               disabled={loading}
             >
-              {loading ? 'Menambahkan...' : 'Tambah'}
+              {loading ? "Menambahkan..." : "Tambah"}
             </button>
           </div>
         </form>

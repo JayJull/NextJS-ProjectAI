@@ -123,6 +123,7 @@ const ProductPage = () => {
       <Layout>
         <section className="relative min-h-[100vh]">
           <div className="container mx-auto px-6 pt-48">
+            <p className="text-white text-center">Product was found</p>
           </div>
         </section>
       </Layout>
