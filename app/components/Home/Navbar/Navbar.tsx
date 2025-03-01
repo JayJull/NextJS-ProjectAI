@@ -1,13 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
-  Popover,
-  PopoverButton,
   PopoverGroup,
-  PopoverPanel,
   Dialog,
   Transition
 } from "@headlessui/react";
@@ -17,43 +13,9 @@ import {
   CursorArrowRaysIcon,
   FingerPrintIcon,
   SquaresPlusIcon,
-  UserIcon
 } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import LoginPopUp from "@/app/components/LoginPopUp/Login";
-
-const products = [
-  {
-    name: "Analytics",
-    description: "Get a better understanding of your traffic",
-    href: "#",
-    icon: ChartPieIcon,
-  },
-  {
-    name: "Engagement",
-    description: "Speak directly to your customers",
-    href: "#",
-    icon: CursorArrowRaysIcon,
-  },
-  {
-    name: "Security",
-    description: "Your customers data will be safe and secure",
-    href: "#",
-    icon: FingerPrintIcon,
-  },
-  {
-    name: "Integrations",
-    description: "Connect with third-party tools",
-    href: "#",
-    icon: SquaresPlusIcon,
-  },
-  {
-    name: "Automations",
-    description: "Build strategic funnels that will convert",
-    href: "#",
-    icon: ArrowPathIcon,
-  },
-];
 
 interface NavbarProps {
   showLoginModal?: boolean;
@@ -75,7 +37,7 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
     }
   };
   
-  // Update local state when the prop changes
+  
   useEffect(() => {
     setLocalShowLoginModal(initialShowLoginModal);
   }, [initialShowLoginModal]);
