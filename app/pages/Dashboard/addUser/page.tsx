@@ -41,7 +41,7 @@ const AddUser = () => {
   // Fetch users on component mount
   useEffect(() => {
     fetchUsers();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +67,10 @@ const AddUser = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ 
+          username, 
+          password 
+        }),
       });
 
       if (!response.ok) {
@@ -138,14 +141,14 @@ const AddUser = () => {
     }
 
     try {
-      const response = await fetch(`/api/users/${currentEditUser.id}`, {
+      const response = await fetch(`/apix/users/${currentEditUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
           username: editUsername,
-          password: editPassword || undefined // Only send password if it's changed
+          password: editPassword || undefined 
         }),
       });
 

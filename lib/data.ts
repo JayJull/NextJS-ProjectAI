@@ -1,8 +1,9 @@
 "use server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import * as bcrypt from "bcryptjs";
 
 interface CreateAIData {
@@ -22,27 +23,31 @@ interface LoginData {
   rememberMe?: boolean;
 }
 
-interface SignupData {
-  username: string;
-  password: string;
-}
-
 interface LoginResult {
   success: boolean;
   error?: string;
+  ipAddress?: string;
 }
 
-interface SignupResult {
-  success: boolean;
-  error?: string;
+interface ActivityLogData {
+  action: string;
+  details?: string;
+  ipAddress?: string;
+  userId?: number;
 }
 
-interface AdminResult {
-  success: boolean;
-  message?: string;
-  error?: string;
+interface ActivityLog {
+  id: number;
+  action: string;
+  details: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  userId: number | null;
+  timestamp: Date;
+  user?: {
+    username: string;
+  } | null;
 }
-
 
 interface UpdateAIData extends CreateAIData {
   id: number;
@@ -456,28 +461,47 @@ export async function login(data: LoginData): Promise<LoginResult> {
       throw new Error("Username atau password salah");
     }
 
+    // Get IP address
+    const headersList = await headers();
+    const ipAddress = headersList.get('x-forwarded-for') || 
+                      headersList.get('x-real-ip') || 
+                      'unknown';
+
     // Set cookie with session information
     const cookieExpires = data.rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days or 24 hours
     
-    // Create a session token (in a real app, you would use a more secure method)
+    // Create a session token with more security
     const sessionToken = await bcrypt.hash(user.id.toString() + Date.now().toString(), 10);
     
-    const cookieStore = await cookies();
-    cookieStore.set("sessionToken", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: cookieExpires,
-      path: "/",
+    // Create a new session in the database
+    const session = await prisma.session.create({
+      data: {
+        token: sessionToken,
+        userId: user.id,
+        expires: new Date(Date.now() + cookieExpires),
+        ipAddress: ipAddress.toString(),
+        userAgent: (await headers()).get('user-agent') || 'unknown'
+      }
     });
     
-    cookieStore.set("userId", user.id.toString(), {
+    const cookieStore = await cookies();
+    await cookieStore.set("sessionToken", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: cookieExpires,
       path: "/",
+      sameSite: "strict"
+    });
+    
+    await cookieStore.set("userId", user.id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: cookieExpires,
+      path: "/",
+      sameSite: "strict"
     });
 
-    return { success: true };
+    return { success: true, ipAddress: ipAddress.toString() };
   } catch (error) {
     console.error("Login error:", error);
     if (error instanceof Error) {
@@ -487,101 +511,116 @@ export async function login(data: LoginData): Promise<LoginResult> {
   }
 }
 
-export async function signup(data: SignupData): Promise<SignupResult> {
+export async function logActivity(data: ActivityLogData): Promise<{ success: boolean; error?: string }> {
   try {
-    // Validate input
-    if (!data.username || !data.password) {
-      throw new Error("Username, email, dan password harus diisi");
-    }
-
-    // Check if username already exists
-    const existingUsername = await prisma.user.findUnique({
-      where: {
-        username: data.username,
-      },
-    });
-
-    if (existingUsername) {
-      throw new Error("Username sudah digunakan");
-    }
-
-    // Check if email already exists (you need to add email field to your Prisma schema)
-    // Assuming you have email field in your user model
-    const existingEmail = await prisma.user.findFirst({
-      where: {
-        username: data.username,
-      },
-    });
-
-    if (existingEmail) {
-      throw new Error("Email sudah terdaftar");
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
-    // Create new user
-    await prisma.user.create({
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
+    const headersList = await headers();
+    
+    // Get IP address if not provided
+    const ipAddress = data.ipAddress || 
+                     headersList.get('x-forwarded-for') || 
+                     headersList.get('x-real-ip') || 
+                     'unknown';
+    
+    // Create activity log
+    await prisma.activityLog.create({
       data: {
-        username: data.username,
-        password: hashedPassword,
-      },
+        action: data.action,
+        details: data.details || "",
+        ipAddress: ipAddress.toString(),
+        userAgent: headersList.get('user-agent') || 'unknown',
+        userId: userId ? parseInt(userId) : (data.userId || null),
+        timestamp: new Date()
+      }
     });
-
+    
     return { success: true };
   } catch (error) {
-    console.error("Signup error:", error);
-    if (error instanceof Error) {
-      return { success: false, error: error.message };
-    }
-    return { success: false, error: "Gagal melakukan pendaftaran" };
+    console.error("Error logging activity:", error);
+    return { success: false, error: "Failed to log activity" };
   }
 }
 
 export async function logout(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete("sessionToken");
-  cookieStore.delete("userId");
-  redirect("/");
-}
-
-export async function createInitialAdmin(): Promise<AdminResult> {
   try {
-    // Check if admin already exists
-    const existingAdmin = await prisma.user.findUnique({
-      where: {
-        username: "bigkreatif",
-      },
-    });
-
-    if (existingAdmin) {
-      return { success: true, message: "Admin user already exists" };
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("sessionToken")?.value;
+    const userId = cookieStore.get("userId")?.value;
+    
+    if (sessionToken) {
+      // Remove session from database
+      await prisma.session.deleteMany({
+        where: {
+          token: sessionToken
+        }
+      });
+      
+      // Log logout activity
+      await logActivity({
+        action: "logout",
+        details: `User logged out`,
+        userId: userId ? parseInt(userId) : undefined
+      });
     }
-
-    // Create default admin user
-    const hashedPassword = await bcrypt.hash("bk12345", 10);
-    await prisma.user.create({
-      data: {
-        username: "bigkreatif",
-        password: hashedPassword,
-      },
-    });
-
-    return { success: true, message: "Admin user created successfully" };
+    
+    // Clear cookies
+    await cookieStore.delete("sessionToken");
+    await cookieStore.delete("userId");
+    redirect("/");
   } catch (error) {
-    console.error("Error creating initial admin:", error);
-    return { success: false, error: "Failed to create admin user" };
+    console.error("Logout error:", error);
+    redirect("/");
   }
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("sessionToken");
-  const userId = cookieStore.get("userId");
-  
-  if (!sessionToken || !userId) {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("sessionToken")?.value;
+    const userId = cookieStore.get("userId")?.value;
+    
+    if (!sessionToken || !userId) {
+      return false;
+    }
+    
+    // Check if session exists and is not expired
+    const session = await prisma.session.findFirst({
+      where: {
+        token: sessionToken,
+        userId: parseInt(userId),
+        expires: {
+          gt: new Date()
+        }
+      }
+    });
+    
+    return !!session;
+  } catch (error) {
+    console.error("Authentication check error:", error);
     return false;
   }
-  
-  return true;
+}
+
+export async function getActivityLogs(limit = 50): Promise<ActivityLog[]> {
+  try {
+    const logs = await prisma.activityLog.findMany({
+      take: limit,
+      orderBy: {
+        timestamp: 'desc'
+      },
+      include: {
+        user: {
+          select: {
+            username: true
+          }
+        }
+      }
+    });
+    
+    return logs;
+  } catch (error) {
+    console.error("Error fetching activity logs:", error);
+    throw new Error("Failed to fetch activity logs");
+  }
 }
