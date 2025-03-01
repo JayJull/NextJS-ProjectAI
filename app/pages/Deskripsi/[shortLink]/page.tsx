@@ -32,7 +32,7 @@ const ProductPage = () => {
     if (shortLink) {
       return `/aff/${shortLink}`;
     }
-    return shortLink || '/404';
+    return shortLink || "/404";
   };
 
   const handleClick = async () => {
@@ -129,10 +129,10 @@ const ProductPage = () => {
       </Layout>
     );
   }
-  
+
   // Fallback image jika gambar kosong
   const imageUrl = product.gambar || "/placeholder-image.jpg";
-  
+
   return (
     <Layout>
       <section className="relative min-h-[100vh]">
@@ -166,7 +166,7 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
-    </section>
+      </section>
 
       <section>
         {/* Deskripsi Lengkap */}
@@ -175,10 +175,12 @@ const ProductPage = () => {
             <h2 className="text-black text-2xl font-bold">Deskripsi Lengkap</h2>
           </div>
           <div className="flex items-start gap-4 ml-10">
-            <div className="mt-8 flex justify-left gap-3">
-              <p className="text-black text-xl text-justify leading-relaxed font-medium">
-                {product.longDesc}
-              </p>
+            <div className="mt-8 flex justify-left gap-3 w-full">
+              {/* Render HTML content safely using dangerouslySetInnerHTML */}
+              <div
+                className="text-black text-xl text-justify leading-relaxed font-medium suneditor-content"
+                dangerouslySetInnerHTML={{ __html: product.longDesc }}
+              />
             </div>
           </div>
           {/* Social Share Buttons */}
@@ -209,21 +211,91 @@ const ProductPage = () => {
           <div className="mt-4 flex justify-left gap-3 ml-10">
             <h2 className="text-black text-2xl font-bold">Related Jobs</h2>
           </div>
-        <div className="grid gap-4 md:grid-cols-2 mt-4 mx-10">
-          {aiTools.map((tool) => (
-            <DeskripsiCard
-            key={tool.id}
-            logo={tool.gambar}
-            name={tool.name}
-            category={tool.kategori.nama}
-            shortDesc={tool.shortDesc}
-            url={tool.url}
-            shortLink={tool.shortLink || ""}
-            />
-          ))}
-        </div>
+          <div className="grid gap-4 md:grid-cols-2 mt-4 mx-10">
+            {aiTools.map((tool) => (
+              <DeskripsiCard
+                key={tool.id}
+                logo={tool.gambar}
+                name={tool.name}
+                category={tool.kategori.nama}
+                shortDesc={tool.shortDesc}
+                url={tool.url}
+                shortLink={tool.shortLink || ""}
+              />
+            ))}
+          </div>
         </div>
       </section>
+
+      <style jsx global>{`
+        .suneditor-content a {
+          color: #2563eb;
+          text-decoration: none;
+          font-weight: 500;
+        }
+
+        .suneditor-content a:hover {
+          color: #1d4ed8;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+
+        /* Styling tambahan lainnya untuk elemen SunEditor */
+        .suneditor-content h1,
+        .suneditor-content h2,
+        .suneditor-content h3 {
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+          font-weight: bold;
+        }
+
+        .suneditor-content ul,
+        .suneditor-content ol {
+          margin-left: 1.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .suneditor-content ul {
+          list-style-type: disc;
+        }
+
+        .suneditor-content ol {
+          list-style-type: decimal;
+        }
+
+        /* Styling untuk tabel */
+        .suneditor-content table {
+          width: auto;
+          table-layout: auto;
+          border-collapse: collapse;
+          margin: 1rem 0;
+        }
+
+        .suneditor-content table,
+        .suneditor-content th,
+        .suneditor-content td {
+          border: 1px solid black; /* Warna border */
+        }
+
+        .suneditor-content th,
+        .suneditor-content td {
+          border: 1px solid black;
+          padding: 8px;
+          text-align: left;
+          vertical-align: top;
+          max-width: 150px; /* Batas lebar kolom */
+          word-wrap: break-word;
+        }
+
+        .suneditor-content th {
+          background-color: #f3f4f6; /* Warna background header */
+          font-weight: bold;
+        }
+
+        .suneditor-content tr:nth-child(even) {
+          background-color: #f9fafb; /* Warna background baris genap */
+        }
+      `}</style>
     </Layout>
   );
 };
