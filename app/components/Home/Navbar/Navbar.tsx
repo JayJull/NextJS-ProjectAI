@@ -55,11 +55,30 @@ const products = [
   },
 ];
 
-const Navbar = () => {
+interface NavbarProps {
+  showLoginModal?: boolean;
+  setShowLoginModal?: (show: boolean) => void;
+}
+
+const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginModal: externalSetShowLoginModal }: NavbarProps) => {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLoginModal, setLocalShowLoginModal] = useState(initialShowLoginModal);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Use the external state setter if provided, otherwise use the local one
+  const handleSetShowLoginModal = (value: boolean) => {
+    if (externalSetShowLoginModal) {
+      externalSetShowLoginModal(value);
+    } else {
+      setLocalShowLoginModal(value);
+    }
+  };
+  
+  // Update local state when the prop changes
+  useEffect(() => {
+    setLocalShowLoginModal(initialShowLoginModal);
+  }, [initialShowLoginModal]);
   
   const handleScroll = () => {
     if (window.scrollY >= 10) {
@@ -91,7 +110,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogin = () => {
-    setShowLoginModal(true);
+    handleSetShowLoginModal(true);
   };
 
   const handleLogout = async () => {
@@ -104,6 +123,9 @@ const Navbar = () => {
       console.error("Logout error:", error);
     }
   };
+
+  // The actual showLoginModal value to use in the component
+  const currentShowLoginModal = externalSetShowLoginModal ? initialShowLoginModal : showLoginModal;
 
   return (
     <>
@@ -266,7 +288,7 @@ const Navbar = () => {
                           <button 
                             onClick={() => {
                               setMobileMenu(false);
-                              setShowLoginModal(true);
+                              handleSetShowLoginModal(true);
                             }}
                             className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700 w-full text-left"
                           >
@@ -291,23 +313,33 @@ const Navbar = () => {
       </Transition.Root>
 
       {/* Login Modal */}
-      {showLoginModal && (
+      {currentShowLoginModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-4 flex justify-between items-center border-b">
               <h3 className="text-xl font-semibold">Login</h3>
               <button
-                onClick={() => setShowLoginModal(false)}
+                onClick={() => handleSetShowLoginModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <div className="p-6">
-              <LoginPopUp onClose={() => setShowLoginModal(false)} onLoginSuccess={() => {
-                setIsLoggedIn(true);
-                setShowLoginModal(false);
-              }} />
+              <LoginPopUp 
+                onClose={() => handleSetShowLoginModal(false)} 
+                onLoginSuccess={() => {
+                  setIsLoggedIn(true);
+                  handleSetShowLoginModal(false);
+
+                  // Add redirect after successful login if returnUrl is present
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const returnUrl = urlParams.get('returnUrl');
+                  if (returnUrl) {
+                    window.location.href = decodeURIComponent(returnUrl);
+                  }
+                }} 
+              />
             </div>
           </div>
         </div>

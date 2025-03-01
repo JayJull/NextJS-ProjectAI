@@ -15,7 +15,6 @@ const LoginPopUp = ({ onClose, onLoginSuccess }:any) => {
 
     try {
       const { login, logActivity } = await import('@/lib/data');
-      
       const result = await login({
         username,
         password,
@@ -23,7 +22,6 @@ const LoginPopUp = ({ onClose, onLoginSuccess }:any) => {
       });
 
       if (result.success) {
-        // Log the login activity
         await logActivity({
           action: "login",
           details: `User ${username} logged in`,
