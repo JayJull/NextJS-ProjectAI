@@ -128,7 +128,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    AOS.init({ duration: 1000 }); // Inisialisasi AOS
+    AOS.init({ duration: 1000 });
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {

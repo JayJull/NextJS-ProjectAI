@@ -1,43 +1,54 @@
-// File: app/api/users/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+// File: app/api/admin/users/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { isAuthenticated } from "@/lib/data";
 
-const prisma = new PrismaClient();
-
-// GET /api/users - Get all users
-export async function GET() {
+// GET /api/admin/users - Fetch all users
+export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const authenticated = await isAuthenticated();
+    if (!authenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
         username: true,
         createdAt: true,
-        updatedAt: true,
-        // Don't include password in the response
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
-    
+
     return NextResponse.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
     return NextResponse.json(
-      { message: 'Terjadi kesalahan saat mengambil data user' },
+      { error: "Failed to fetch users" },
       { status: 500 }
     );
   }
 }
 
-// POST /api/users - Create a new user
+// POST /api/admin/users - Create a new user
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { username, password } = body;
+    // Check authentication
+    const authenticated = await isAuthenticated();
+    if (!authenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { username, password } = await request.json();
 
     // Validate input
     if (!username || !password) {
       return NextResponse.json(
-        { message: 'Username dan password harus diisi' },
+        { message: "Username dan password harus diisi" },
         { status: 400 }
       );
     }
@@ -49,34 +60,43 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { message: 'Username sudah digunakan' },
+        { message: "Username sudah digunakan" },
         { status: 400 }
       );
     }
 
-    // Hash the password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the user
-    const user = await prisma.user.create({
+    // Create user
+    const newUser = await prisma.user.create({
       data: {
         username,
         password: hashedPassword,
       },
+      select: {
+        id: true,
+        username: true,
+        createdAt: true,
+      },
     });
 
-    return NextResponse.json(
-      {
-        id: user.id,
-        username: user.username,
-        createdAt: user.createdAt,
+    // Log the activity
+    await prisma.activityLog.create({
+      data: {
+        action: "CREATE_USER",
+        details: `User ${username} created`,
+        userId: parseInt(request.cookies.get("userId")?.value || "0"),
+        ipAddress: request.headers.get("x-forwarded-for")?.split(',')[0] || "IP tidak ditemukan",
+        userAgent: request.headers.get("user-agent"),
       },
-      { status: 201 }
-    );
+    });
+
+    return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error("Error creating user:", error);
     return NextResponse.json(
-      { message: 'Terjadi kesalahan saat membuat user baru' },
+      { message: "Gagal menambahkan user" },
       { status: 500 }
     );
   }
