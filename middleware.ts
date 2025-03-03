@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`/?loginModal=true&returnUrl=${returnUrl}`, request.url));
     }
   }
-  
+
   return NextResponse.next();
 }
 
