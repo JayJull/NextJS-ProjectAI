@@ -7,13 +7,6 @@ import {
   Dialog,
   Transition
 } from "@headlessui/react";
-import {
-  ArrowPathIcon,
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
-  SquaresPlusIcon,
-} from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import LoginPopUp from "@/app/components/LoginPopUp/Login";
 

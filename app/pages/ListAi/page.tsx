@@ -8,7 +8,6 @@ import AiCard from "./components/AiCard";
 import { getAi } from "@/lib/data";
 import { AI } from "@/app/data/ai-card";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 const List: React.FC = () => {
   const searchParams = useSearchParams();

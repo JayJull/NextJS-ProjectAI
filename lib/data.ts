@@ -415,22 +415,75 @@ export async function incrementClick(shortLink: string) {
 
 export async function getAiMostFavorite() {
   try {
-    const ais = await prisma.ai.findMany({
+    // First, get all categories
+    const categories = await prisma.kategori.findMany({
+      select: {
+        id: true,
+        nama: true,
+      },
+    });
+    
+    // For each category, get the top 4 AI tools
+    const aisByCategory = await Promise.all(
+      categories.map(async (category) => {
+        const topAisInCategory = await prisma.ai.findMany({
+          where: {
+            kategoriId: category.id,
+          },
+          take: 4,
+          orderBy: {
+            click: 'desc',
+          },
+          include: {
+            kategori: {
+              select: {
+                id: true,
+                nama: true,
+              },
+            },
+          },
+        });
+        
+        return topAisInCategory;
+      })
+    );
+    
+    // Flatten the array of arrays
+    const categoryTopAis = aisByCategory.flat();
+    
+    // Also get the overall top AIs across all categories
+    const overallTopAis = await prisma.ai.findMany({
       take: 4,
       orderBy: {
-        click: 'desc'
+        click: 'desc',
       },
       include: {
         kategori: {
           select: {
             id: true,
             nama: true,
-          }
+          },
         },
       },
     });
     
-    return ais;
+    // Create an explicit type for the category map
+    type CategoryMap = {
+      [key: string]: typeof aisByCategory[0];
+    };
+    
+    // Initialize the result with strongly typed byCategory
+    const result = {
+      all: overallTopAis,
+      byCategory: {} as CategoryMap
+    };
+    
+    // Organize the results by category name
+    categories.forEach((category, index) => {
+      result.byCategory[category.nama] = aisByCategory[index];
+    });
+    
+    return result;
   } catch (error) {
     console.error("Error fetching AI data:", error);
     throw new Error("Failed to fetch AI data");
