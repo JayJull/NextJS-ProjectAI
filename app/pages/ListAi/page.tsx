@@ -203,7 +203,7 @@ const List: React.FC = () => {
             <div className="text-center py-10 text-red-600">{error}</div>
           ) : (
             <>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid md:grid-cols-2">
                 {currentItems.map((tool) => (
                   <AiCard
                     key={tool.id}
