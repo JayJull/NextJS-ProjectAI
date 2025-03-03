@@ -55,13 +55,12 @@ const List: React.FC = () => {
 
   return (
     <Layout>
-
-      <section className="relative min-h-[100vh]">
+      <section className="relative min-h-[70vh] md:min-h-[100vh]">
         <div className="relative z-10">
-          <div className="container mx-auto px-6 pt-48">
+          <div className="container mx-auto px-4 sm:px-6 pt-24 md:pt-48">
             <div className="max-w-4xl mx-auto text-center">
               <h1
-                className="text-white font-sans text-5xl font-bold mb-6"
+                className="text-white font-sans text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6"
                 data-aos="fade-up"
                 data-aos-delay="500"
                 data-aos-once="true"
@@ -69,7 +68,7 @@ const List: React.FC = () => {
                 Find Your AI
               </h1>
               <p
-                className="text-lg mb-8 text-white/90"
+                className="text-base sm:text-lg mb-6 sm:mb-8 text-white/90 px-4"
                 data-aos="fade-up"
                 data-aos-delay="700"
                 data-aos-once="true"
@@ -81,14 +80,14 @@ const List: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-24 px-36">
+      <section className="py-60 sm:py-16 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-36">
         <div className="mt-1">
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-black">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
+            <p className="text-black text-sm sm:text-base">
               Showing 1 — {filteredTools.length} of {aiTools.length} results
             </p>
-            <div className="flex gap-4">
-              <select className="text-black px-4 py-2 rounded">
+            <div className="flex gap-4 w-full sm:w-auto">
+              <select className="text-black px-4 py-2 rounded w-full sm:w-auto">
                 <option>Sort by (Default)</option>
               </select>
             </div>
@@ -98,9 +97,10 @@ const List: React.FC = () => {
             <div className="text-center py-10">Loading...</div>
           ) : error ? (
             <div className="text-center py-10 text-red-600">{error}</div>
+          ) : filteredTools.length === 0 ? (
+            <div className="text-center py-10">No AI tools found matching your criteria.</div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
               {filteredTools.map((tool) => (
                 <AiCard
                   key={tool.id}
