@@ -18,19 +18,31 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   }, [searchParams]);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <div
-        className="absolute inset-0 z-0"
+        className="absolute top-0 left-0 right-0 w-full h-full z-0"
         style={{
           backgroundImage: "url('/background/2.png')",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center top",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
         }}
       />
 
-      <Navbar showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal} />
-      {children}
-      <Footer />
-    </>
+      {/* Content Container */}
+      <div className="relative z-auto flex flex-col min-h-screen">
+        <Navbar 
+          showLoginModal={showLoginModal} 
+          setShowLoginModal={setShowLoginModal} 
+        />
+        
+        <main className="flex-grow">
+          {children}
+        </main>
+        
+        <Footer />
+      </div>
+    </div>
   );
 };
