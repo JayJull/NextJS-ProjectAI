@@ -14,15 +14,8 @@ interface AI {
   kategori: Category;
   url: string;
   shortDesc: string;
-  shortLink: string | null;
+  shortLink: string | null; // Updated to allow null values
   click: number;
-}
-
-interface AiData {
-  all: AI[];
-  byCategory: {
-    [categoryName: string]: AI[];
-  };
 }
 
 interface JobCardProps {
@@ -31,7 +24,7 @@ interface JobCardProps {
   kategori: Category;
   url: string;
   shortDesc: string;
-  shortLink: string | null;
+  shortLink: string | null; // Updated to allow null values
 }
 
 const JobCard: React.FC<JobCardProps> = ({
@@ -87,7 +80,7 @@ const JobCard: React.FC<JobCardProps> = ({
 };
 
 const JobListings: React.FC = () => {
-  const [aiData, setAiData] = useState<AiData | null>(null);
+  const [ais, setAis] = useState<AI[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [isOverflowing, setIsOverflowing] = useState<boolean>(false);
@@ -96,12 +89,27 @@ const JobListings: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [aisMostFavorite, categoriesData] = await Promise.all([
+        const [aisData, categoriesData] = await Promise.all([
           getAiMostFavorite(),
           getKategori()
         ]);
         
-        setAiData(aisMostFavorite);
+        // Make sure we handle the data shape correctly
+        const validAis: AI[] = aisData.map(ai => ({
+          id: ai.id,
+          gambar: ai.gambar,
+          name: ai.name,
+          kategori: {
+            id: ai.kategori.id,
+            nama: ai.kategori.nama
+          },
+          url: ai.url,
+          shortDesc: ai.shortDesc,
+          shortLink: ai.shortLink, // This can now be null
+          click: ai.click
+        }));
+        
+        setAis(validAis);
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -125,18 +133,10 @@ const JobListings: React.FC = () => {
     return () => window.removeEventListener('resize', checkOverflow);
   }, [categories]);
 
-  // Get the appropriate AI list based on selected filter
-  const getFilteredAis = () => {
-    if (!aiData) return [];
-    
-    if (selectedFilter === 'All') {
-      return aiData.all;
-    } else {
-      return aiData.byCategory[selectedFilter] || [];
-    }
-  };
+  const filteredAis = selectedFilter === 'All' 
+    ? ais
+    : ais.filter(ai => ai.kategori.nama === selectedFilter);
 
-  const filteredAis = getFilteredAis();
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 3);
 
   return (
