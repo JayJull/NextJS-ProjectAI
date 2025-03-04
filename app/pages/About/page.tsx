@@ -5,29 +5,29 @@ import { Layout } from "@/app/components/Home/Layout";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
-import rhoma from '../../../public/rhoma.jpeg';
-import prabowo from '../../../public/prabowo.jpeg';
-import sarah from '../../../public/sarah.jpeg';
+import rhoma from "../../../public/rhoma.jpeg";
+import prabowo from "../../../public/prabowo.jpeg";
+import sarah from "../../../public/sarah.jpeg";
 
 const teamMembers = [
   {
     id: 1,
     name: "Rhoma Irama",
     role: "Founder & CEO",
-    image: rhoma
+    image: rhoma,
   },
   {
     id: 2,
     name: "Prabowo Subianto",
     role: "Head of AI Research",
-    image: prabowo
+    image: prabowo,
   },
   {
     id: 3,
     name: "Sarah Viloid",
     role: "Technical Lead",
-    image: sarah
-  }
+    image: sarah,
+  },
 ];
 
 const logos = [
@@ -67,29 +67,30 @@ const stats = [
   { id: 1, number: "25,700+", label: "AI Tools Listed" },
   { id: 2, number: "100K+", label: "Monthly Users" },
   { id: 3, number: "50+", label: "Categories" },
-  { id: 4, number: "24/7", label: "Support" }
+  { id: 4, number: "24/7", label: "Support" },
 ];
 
 const values = [
   {
     id: 1,
     title: "Innovation First",
-    description: "We continuously evolve to bring you the latest in AI technology"
+    description:
+      "We continuously evolve to bring you the latest in AI technology",
   },
   {
     id: 2,
     title: "User-Centric",
-    description: "Every feature is designed with our users' needs in mind"
+    description: "Every feature is designed with our users' needs in mind",
   },
   {
     id: 3,
     title: "Quality Assurance",
-    description: "We carefully verify and test each AI tool before listing"
-  }
+    description: "We carefully verify and test each AI tool before listing",
+  },
 ];
 
 const AboutPage = () => {
- // alert(params.shortLink)
+  // alert(params.shortLink)
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
@@ -124,7 +125,9 @@ const AboutPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.id} className="text-center" data-aos="fade-up">
-                <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
+                <div className="text-4xl font-bold text-white mb-2">
+                  {stat.number}
+                </div>
                 <div className="text-blue-200">{stat.label}</div>
               </div>
             ))}
@@ -138,9 +141,10 @@ const AboutPage = () => {
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
             <p className="text-lg text-gray-600">
-              To democratize access to artificial intelligence by creating the most comprehensive
-              and user-friendly platform for discovering AI tools. We believe in making
-              advanced technology accessible to everyone, regardless of their technical expertise.
+              To democratize access to artificial intelligence by creating the
+              most comprehensive and user-friendly platform for discovering AI
+              tools. We believe in making advanced technology accessible to
+              everyone, regardless of their technical expertise.
             </p>
           </div>
         </div>
@@ -194,61 +198,68 @@ const AboutPage = () => {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-24 px-96 rounded-lg bg-blue-900">
-        <div className="max-w-xl mx-auto px-80 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-8">
+      <section className="py-16 px-6 sm:px-12 md:px-24 lg:px-32 xl:px-48 2xl:px-64 rounded-lg bg-blue-900">
+        <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Want to Learn More?
           </h2>
-          <p className="text-xl text-blue-200 mb-12">
-            We're always happy to hear from you. Reach out to our team with any questions.
+          <p className="text-lg sm:text-xl text-blue-200 mb-8">
+            We're always happy to hear from you. Reach out to our team with any
+            questions.
           </p>
           <button
             type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-lg font-semibold px-12 py-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none"
+            className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-lg sm:text-xl font-semibold px-8 sm:px-12 py-3 sm:py-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none"
           >
             Contact Us
           </button>
         </div>
       </section>
-      <section aria-label="Carousel" className="relative">
-          <div className="w-full bg-white py-12 overflow-hidden">
-            <div className="max-w-7xl mx-auto">
-              <div className="relative flex overflow-hidden">
-                {/* First set of logos */}
-                <div className="flex animate-marquee whitespace-nowrap min-w-full">
-                  {logos.map((logo) => (
-                    <div
-                      key={logo.id}
-                      className="flex items-center justify-center flex-grow px-16 min-w-[200px]"
-                    >
-                      <img
-                        src={logo.src}
-                        alt={logo.alt}
-                        className="h-12 w-auto object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
+      <section
+        aria-label="Carousel"
+        className="py-8 md:py-12 bg-white overflow-hidden"
+      >
+        <div className="container mx-auto px-4 mb-6">
+          <p className="text-center text-sm md:text-base text-gray-500 mb-6">
+            Trusted by leading companies
+          </p>
+        </div>
+        <div className="w-full overflow-hidden">
+          <div className="max-w-7xl mx-auto">
+            {/* Using pause on hover for better mobile experience */}
+            <div className="flex space-x-4 sm:space-x-6 md:space-x-8 overflow-hidden">
+              <div className="flex animate-marquee whitespace-nowrap py-4 logos-container">
+                {logos.map((logo) => (
+                  <div
+                    key={logo.id}
+                    className="flex items-center justify-center mx-4 sm:mx-6 md:mx-8 min-w-[100px] sm:min-w-[140px] md:min-w-[180px]"
+                  >
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="h-8 sm:h-10 md:h-12 w-auto object-contain"
+                    />
+                  </div>
+                ))}
 
-                {/* Duplicate set for seamless loop */}
-                <div className="flex animate-marquee2 whitespace-nowrap min-w-full absolute left-full">
-                  {logos.map((logo) => (
-                    <div
-                      key={`${logo.id}-duplicate`}
-                      className="flex items-center justify-center flex-grow px-16 min-w-[200px]"
-                    >
-                      <img
-                        src={logo.src}
-                        alt={logo.alt}
-                        className="h-12 w-auto object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
+                {/* Duplicate set for seamless loop - with enough spacing to prevent overlap */}
+                {logos.map((logo) => (
+                  <div
+                    key={`${logo.id}-duplicate`}
+                    className="flex items-center justify-center mx-4 sm:mx-6 md:mx-8 min-w-[100px] sm:min-w-[140px] md:min-w-[180px]"
+                  >
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="h-8 sm:h-10 md:h-12 w-auto object-contain"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
     </Layout>
   );
 };

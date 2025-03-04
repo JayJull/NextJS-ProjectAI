@@ -53,7 +53,7 @@ const Footer = () => {
                 <Image
                   width={154}
                   height={50}
-                  src="/AIfree.png"
+                  src="/AIfree.webp"
                   alt="AIfree Logo"
                 />
               </div>
@@ -130,20 +130,6 @@ const Footer = () => {
                 </a>
                 . All Right Reserved.
               </p>
-              <div className="flex gap-6 text-white">
-                <a href="#" className="hover:text-gray-300 transition-colors">
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" className="hover:text-gray-300 transition-colors">
-                  <i className="fab fa-twitter"></i>
-                </a>
-                <a href="#" className="hover:text-gray-300 transition-colors">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="hover:text-gray-300 transition-colors">
-                  <i className="fab fa-linkedin-in"></i>
-                </a>
-              </div>
             </div>
           </div>
         </div>

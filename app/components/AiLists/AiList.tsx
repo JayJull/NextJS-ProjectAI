@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookmarkIcon } from 'lucide-react';
+import Image from 'next/image';
 import { getAiMostFavorite, getKategori } from '@/lib/data';
 
 interface Category {
@@ -44,10 +44,14 @@ const JobCard: React.FC<JobCardProps> = ({
       <div className="flex items-start justify-between">
         <div className="flex flex-col sm:flex-row sm:gap-4">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden mb-2 sm:mb-0">
-            <img
+            <Image
               src={gambar}
               alt={name}
+              width={48} // Sesuai dengan w-12 (48px)
+              height={48}
               className="w-full h-full object-cover"
+              loading="lazy" // Lazy loading
+              quality={80} // Mengurangi ukuran file tanpa kehilangan banyak kualitas
             />
           </div>
 
@@ -70,10 +74,6 @@ const JobCard: React.FC<JobCardProps> = ({
             </div>
           </div>
         </div>
-
-        <button className="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0">
-          <BookmarkIcon size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
-        </button>
       </div>
     </div>    
   );

@@ -3,10 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@heroicons/react/20/solid";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import JobListings from "@/app/components/AiLists/AiList";
@@ -79,7 +76,7 @@ const news = [
     title: "Attract Sales And Profits",
     blogSingleTitle:
       "Attract Sales And Profits toward the sunshine - and shadows will fall behind you.",
-    link: "/blog/attract-sales-and-profits",
+    link: "sito.pw",
   },
   {
     id: 2,
@@ -87,7 +84,7 @@ const news = [
     title: "5 Tips For Your Job Interviews",
     blogSingleTitle:
       "5 Tips For Your Job Interviews toward the sunshine - and shadows will fall behind you.",
-    link: "/blog/job-interview-tips",
+    link: "sito.pw",
   },
   {
     id: 3,
@@ -95,7 +92,7 @@ const news = [
     title: "Overworked Newspaper Editor",
     blogSingleTitle:
       "Overworked Newspaper Editor toward the sunshine - and shadows will fall behind you.",
-    link: "/blog/overworked-editor",
+    link: "sito.pw",
   },
 ];
 
@@ -110,7 +107,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>("All Categories");
   const Router = useRouter();
 
   const handleCategorySelect = (category: any) => {
@@ -151,13 +149,13 @@ const Home = () => {
     Router.push(`/pages/ListAi?${params.toString()}`);
   };
 
-  if(isLoading) {
-    return(
+  if (isLoading) {
+    return (
       <div className="flex flex-col justify-center items-center h-screen bg-gray-900">
-      <PulseLoader color="#ffffff" size={15} />
-      <p className="mt-4 text-white text-lg font-semibold">Loading...</p>
-    </div>
-    )
+        <PulseLoader color="#ffffff" size={15} />
+        <p className="mt-4 text-white text-lg font-semibold">Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -443,6 +441,7 @@ const Home = () => {
                   </p>
 
                   <Link
+                    aria-label={`Read more about ${article.title}`}
                     href={article.link}
                     className="mt-4 text-sm md:text-base text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center"
                   >

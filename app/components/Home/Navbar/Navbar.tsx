@@ -1,26 +1,28 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  PopoverGroup,
-  Dialog,
-  Transition
-} from "@headlessui/react";
+import { PopoverGroup, Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import LoginPopUp from "@/app/components/LoginPopUp/Login";
+import Image from "next/image";
 
 interface NavbarProps {
   showLoginModal?: boolean;
   setShowLoginModal?: (show: boolean) => void;
 }
 
-const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginModal: externalSetShowLoginModal }: NavbarProps) => {
+const Navbar = ({
+  showLoginModal: initialShowLoginModal = false,
+  setShowLoginModal: externalSetShowLoginModal,
+}: NavbarProps) => {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [showLoginModal, setLocalShowLoginModal] = useState(initialShowLoginModal);
+  const [showLoginModal, setLocalShowLoginModal] = useState(
+    initialShowLoginModal
+  );
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   // Use the external state setter if provided, otherwise use the local one
   const handleSetShowLoginModal = (value: boolean) => {
     if (externalSetShowLoginModal) {
@@ -29,12 +31,11 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
       setLocalShowLoginModal(value);
     }
   };
-  
-  
+
   useEffect(() => {
     setLocalShowLoginModal(initialShowLoginModal);
   }, [initialShowLoginModal]);
-  
+
   const handleScroll = () => {
     if (window.scrollY >= 10) {
       setScrolled(true);
@@ -42,23 +43,23 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
       setScrolled(false);
     }
   };
-  
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
-    
+
     // Check if user is logged in
     const checkLoginStatus = async () => {
       try {
         // You can replace this with your actual check from cookies or localStorage
-        const userId = document.cookie.includes('userId=');
+        const userId = document.cookie.includes("userId=");
         setIsLoggedIn(userId);
       } catch (error) {
         console.error("Error checking login status:", error);
       }
     };
-    
+
     checkLoginStatus();
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -71,7 +72,7 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
   const handleLogout = async () => {
     try {
       // Import dynamically to avoid server component issues
-      const { logout } = await import('@/lib/data');
+      const { logout } = await import("@/lib/data");
       await logout();
       setIsLoggedIn(false);
     } catch (error) {
@@ -80,7 +81,9 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
   };
 
   // The actual showLoginModal value to use in the component
-  const currentShowLoginModal = externalSetShowLoginModal ? initialShowLoginModal : showLoginModal;
+  const currentShowLoginModal = externalSetShowLoginModal
+    ? initialShowLoginModal
+    : showLoginModal;
 
   return (
     <>
@@ -90,8 +93,14 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
         }`}
       >
         <div className="flex lg:flex-1">
-          <a href="/" className="-m-1.5 p-1.5">          
-            <img alt="Logo" src="/AIfree.png" className="h-16 w-auto ml-4 lg:ml-20" />
+          <a href="/" className="-m-1.5 p-1.5">
+            <Image
+              alt="Logo"
+              src="/AIfree.webp"
+              width={128}
+              height={64}
+              priority
+            />
           </a>
         </div>
 
@@ -107,7 +116,9 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
         </div>
 
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          <a href="/" className="text-sm font-semibold text-white">Home</a>
+          <a href="/" className="text-sm font-semibold text-white">
+            Home
+          </a>
           <a href="/pages/ListAi" className="text-sm font-semibold text-white">
             Find AI
           </a>
@@ -119,7 +130,8 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
-              <a href="/pages/Dashboard"
+              <a
+                href="/pages/Dashboard"
                 className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-6 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Dashboard
@@ -139,7 +151,8 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
               >
                 Login
               </button>
-              <a href="/pages/Dashboard"
+              <a
+                href="/pages/Dashboard"
                 className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-8 py-3 me-16 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Get Started
@@ -196,22 +209,22 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
                   </div>
                   <div className="divide-y divide-gray-200">
                     <div className="px-6 py-4">
-                      <a 
-                        href="/" 
+                      <a
+                        href="/"
                         className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                         onClick={() => setMobileMenu(false)}
                       >
                         Home
                       </a>
-                      <a 
-                        href="/pages/ListAi" 
+                      <a
+                        href="/pages/ListAi"
                         className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                         onClick={() => setMobileMenu(false)}
                       >
                         Find AI
                       </a>
-                      <a 
-                        href="/pages/About" 
+                      <a
+                        href="/pages/About"
                         className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                         onClick={() => setMobileMenu(false)}
                       >
@@ -221,14 +234,14 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
                     <div className="px-6 py-4">
                       {isLoggedIn ? (
                         <>
-                          <a 
-                            href="/pages/Dashboard" 
+                          <a
+                            href="/pages/Dashboard"
                             className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                             onClick={() => setMobileMenu(false)}
                           >
                             Dashboard
                           </a>
-                          <button 
+                          <button
                             onClick={() => {
                               handleLogout();
                               setMobileMenu(false);
@@ -240,7 +253,7 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
                         </>
                       ) : (
                         <>
-                          <button 
+                          <button
                             onClick={() => {
                               setMobileMenu(false);
                               handleSetShowLoginModal(true);
@@ -249,8 +262,8 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
                           >
                             Login
                           </button>
-                          <a 
-                            href="/pages/Dashboard" 
+                          <a
+                            href="/pages/Dashboard"
                             className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                             onClick={() => setMobileMenu(false)}
                           >
@@ -281,19 +294,19 @@ const Navbar = ({ showLoginModal: initialShowLoginModal = false, setShowLoginMod
               </button>
             </div>
             <div className="p-6">
-              <LoginPopUp 
-                onClose={() => handleSetShowLoginModal(false)} 
+              <LoginPopUp
+                onClose={() => handleSetShowLoginModal(false)}
                 onLoginSuccess={() => {
                   setIsLoggedIn(true);
                   handleSetShowLoginModal(false);
 
                   // Add redirect after successful login if returnUrl is present
                   const urlParams = new URLSearchParams(window.location.search);
-                  const returnUrl = urlParams.get('returnUrl');
+                  const returnUrl = urlParams.get("returnUrl");
                   if (returnUrl) {
                     window.location.href = decodeURIComponent(returnUrl);
                   }
-                }} 
+                }}
               />
             </div>
           </div>
