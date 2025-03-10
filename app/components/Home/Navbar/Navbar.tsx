@@ -89,7 +89,7 @@ const Navbar = ({
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 mx-auto flex items-center justify-between p-6 lg:px-8 z-50 ${
+        className={`fixed top-0 left-0 right-0 mx-auto flex items-center justify-between p-6 lg:px-8 z-40 ${
           scrolled ? "bg-blue-800 shadow-lg" : "bg-transparent"
         }`}
       >
@@ -109,7 +109,7 @@ const Navbar = ({
           <button
             type="button"
             onClick={() => setMobileMenu(true)}
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white hover:bg-blue-700 transition-colors"
           >
             <span className="sr-only">Open main menu</span>
             <Bars3Icon className="size-6" aria-hidden="true" />
@@ -160,9 +160,10 @@ const Navbar = ({
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Full-height Side Mobile menu */}
       <Transition.Root show={mobileMenu} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={setMobileMenu}>
+          {/* Background overlay */}
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-300"
@@ -172,100 +173,128 @@ const Navbar = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+            <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
           </Transition.Child>
 
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center text-center md:items-center md:px-2 lg:px-4">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
-                enterTo="opacity-100 translate-y-0 md:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 md:scale-100"
-                leaveTo="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
-              >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full sm:max-w-lg sm:w-full">
-                  <div className="bg-blue-800 p-6">
-                    <div className="flex items-center justify-between">
-                      <Dialog.Title
-                        as="h3"
-                        className="text-xl font-semibold leading-6 text-white"
-                      >
-                        Menu
-                      </Dialog.Title>
-                      <button
-                        type="button"
-                        className="rounded-md text-white hover:text-gray-300 focus:outline-none"
-                        onClick={() => setMobileMenu(false)}
-                      >
-                        <span className="sr-only">Close</span>
-                        <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="divide-y divide-gray-200">
-                    <div className="px-6 py-4">
-                      <Link
-                        href="/"
-                        className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
-                        onClick={() => setMobileMenu(false)}
-                      >
-                        Home
-                      </Link>
-                      <a
-                        href="/pages/ListAi"
-                        className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
-                        onClick={() => setMobileMenu(false)}
-                      >
-                        Find AI
-                      </a>
-                      <a
-                        href="/pages/About"
-                        className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
-                        onClick={() => setMobileMenu(false)}
-                      >
-                        About
-                      </a>
-                    </div>
-                    <div className="px-6 py-4">
-                      {isLoggedIn ? (
-                        <>
-                          <a
-                            href="/pages/Dashboard"
-                            className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
+          {/* Slide-in panel */}
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
+                <Transition.Child
+                  as={Fragment}
+                  enter="transform transition ease-in-out duration-500"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0"
+                  leave="transform transition ease-in-out duration-500"
+                  leaveFrom="translate-x-0"
+                  leaveTo="translate-x-full"
+                >
+                  <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
+                    <div className="flex h-full flex-col overflow-y-auto bg-gradient-to-b from-blue-900 to-blue-700 shadow-xl">
+                      <div className="px-6 pt-6 pb-4">
+                        <div className="flex items-center justify-between">
+                          <Link href="/" className="flex" onClick={() => setMobileMenu(false)}>
+                            <Image
+                              alt="Logo"
+                              src="/AIfree.webp"
+                              width={100}
+                              height={50}
+                              priority
+                            />
+                          </Link>
+                          <button
+                            type="button"
+                            className="inline-flex items-center justify-center rounded-md text-white hover:text-gray-300 focus:outline-none"
                             onClick={() => setMobileMenu(false)}
                           >
-                            Dashboard
-                          </a>
-                          <button
-                            onClick={() => {
-                              handleLogout();
-                              setMobileMenu(false);
-                            }}
-                            className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700 w-full text-left"
-                          >
-                            Logout
+                            <span className="sr-only">Close panel</span>
+                            <XMarkIcon className="h-7 w-7" aria-hidden="true" />
                           </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => {
-                              setMobileMenu(false);
-                              handleSetShowLoginModal(true);
-                            }}
-                            className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700 w-full text-left"
+                        </div>
+                      </div>
+                      <div className="flex-1 divide-y divide-gray-100/20">
+                        <div className="flex flex-col space-y-1 px-6 py-8">
+                          {/* Menu Items */}
+                          <Link
+                            href="/"
+                            className="group flex items-center py-4 text-lg font-medium text-white"
+                            onClick={() => setMobileMenu(false)}
                           >
-                            Login
-                          </button>
-                        </>
-                      )}
+                            <span className="relative overflow-hidden">
+                              Search
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-500 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                          <Link
+                            href="/pages/Homepage"
+                            className="group flex items-center py-4 text-lg font-medium text-white"
+                            onClick={() => setMobileMenu(false)}
+                          >
+                            <span className="relative overflow-hidden">
+                              Home
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-500 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                          <Link
+                            href="/pages/ListAi"
+                            className="group flex items-center py-4 text-lg font-medium text-white"
+                            onClick={() => setMobileMenu(false)}
+                          >
+                            <span className="relative overflow-hidden">
+                              Find AI
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-500 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                          <Link
+                            href="/pages/About"
+                            className="group flex items-center py-4 text-lg font-medium text-white"
+                            onClick={() => setMobileMenu(false)}
+                          >
+                            <span className="relative overflow-hidden">
+                              About
+                              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-500 group-hover:w-full"></span>
+                            </span>
+                          </Link>
+                        </div>
+
+                        {/* Account Section */}
+                        <div className="px-6 py-10 mt-auto">
+                          {isLoggedIn ? (
+                            <div className="space-y-6">
+                              <a
+                                href="/pages/Dashboard"
+                                className="flex w-full justify-center items-center bg-white text-blue-900 rounded-full px-6 py-3 text-base font-medium shadow-md hover:bg-gray-100 transition-colors"
+                                onClick={() => setMobileMenu(false)}
+                              >
+                                Dashboard
+                              </a>
+                              <button
+                                onClick={() => {
+                                  handleLogout();
+                                  setMobileMenu(false);
+                                }}
+                                className="flex w-full justify-center text-white border border-white rounded-full px-6 py-3 text-base font-medium hover:bg-white/10 transition-colors"
+                              >
+                                Logout
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setMobileMenu(false);
+                                handleSetShowLoginModal(true);
+                              }}
+                              className="flex w-full justify-center items-center bg-white text-blue-900 rounded-full px-6 py-3 text-base font-medium shadow-md hover:bg-gray-100 transition-colors"
+                            >
+                              Login
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
             </div>
           </div>
         </Dialog>
