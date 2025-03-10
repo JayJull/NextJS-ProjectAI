@@ -42,7 +42,7 @@ const List: React.FC = () => {
     AOS.init({ duration: 1000 });
   }, []);
 
-  // Mengambil kategori seperti di homepage
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {

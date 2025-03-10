@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     if (!sessionToken || !userId) {
       // Store the intended URL to redirect back after login
       const returnUrl = encodeURIComponent(request.nextUrl.pathname);
-      return NextResponse.redirect(new URL(`/?loginModal=true&returnUrl=${returnUrl}`, request.url));
+      return NextResponse.redirect(new URL(`/pages/Homepage/?loginModal=true&returnUrl=${returnUrl}`, request.url));
     }
   }
 

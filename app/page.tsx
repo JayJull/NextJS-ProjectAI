@@ -1,9 +1,9 @@
-import Home from "./pages/Homepage/page"
+import Search from "./pages/Search/page"
 
 const Index = () => {
   return (
     <>
-    <Home/>
+    <Search/>
     </>
   )
 }

@@ -6,6 +6,7 @@ import { PopoverGroup, Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import LoginPopUp from "@/app/components/LoginPopUp/Login";
 import Image from "next/image";
+import Link from "next/link";
 
 interface NavbarProps {
   showLoginModal?: boolean;
@@ -93,7 +94,7 @@ const Navbar = ({
         }`}
       >
         <div className="flex lg:flex-1">
-          <a href="/" className="-m-1.5 p-1.5">
+          <Link href="/" className="-m-1.5 p-1.5">
             <Image
               alt="Logo"
               src="/AIfree.webp"
@@ -101,7 +102,7 @@ const Navbar = ({
               height={64}
               priority
             />
-          </a>
+          </Link>
         </div>
 
         <div className="flex lg:hidden">
@@ -116,15 +117,18 @@ const Navbar = ({
         </div>
 
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          <a href="/" className="text-sm font-semibold text-white">
+          <Link href="/pages/Homepage" className="text-sm font-semibold text-white">
             Home
-          </a>
-          <a href="/pages/ListAi" className="text-sm font-semibold text-white">
+          </Link>
+          <Link href="/pages/ListAi" className="text-sm font-semibold text-white">
             Find AI
-          </a>
-          <a href="/pages/About" className="text-sm font-semibold text-white">
+          </Link>
+          <Link href="/pages/About" className="text-sm font-semibold text-white">
             About
-          </a>
+          </Link>
+          <Link href="/pages/Search" className="text-sm font-semibold text-white">
+            Search
+          </Link>
         </PopoverGroup>
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -151,12 +155,6 @@ const Navbar = ({
               >
                 Login
               </button>
-              <a
-                href="/pages/Dashboard"
-                className="text-white bg-blue-700 hover:bg-blue-800 font-sans rounded-full text-sm font-semibold px-8 py-3 me-16 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-              >
-                Get Started
-              </a>
             </div>
           )}
         </div>
@@ -209,13 +207,13 @@ const Navbar = ({
                   </div>
                   <div className="divide-y divide-gray-200">
                     <div className="px-6 py-4">
-                      <a
+                      <Link
                         href="/"
                         className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
                         onClick={() => setMobileMenu(false)}
                       >
                         Home
-                      </a>
+                      </Link>
                       <a
                         href="/pages/ListAi"
                         className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
@@ -262,13 +260,6 @@ const Navbar = ({
                           >
                             Login
                           </button>
-                          <a
-                            href="/pages/Dashboard"
-                            className="block py-3 text-base font-medium text-gray-900 hover:text-blue-700"
-                            onClick={() => setMobileMenu(false)}
-                          >
-                            Get Started
-                          </a>
                         </>
                       )}
                     </div>
