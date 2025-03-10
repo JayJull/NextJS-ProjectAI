@@ -7,79 +7,55 @@ const SearchPage: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const router = useRouter();
 
-  // Improved function to extract keywords and settings from natural language query
-  const processSearchQuery = (query: string): { 
-    keywords: string[];
-    category?: string; 
-  } => {
+  // Enhanced function to extract keywords from search query in a Google-like way
+  const extractKeywords = (query: string): string[] => {
     const query_lower = query.toLowerCase().trim();
     
-    // Detect category
-    let category: string | undefined = undefined;
-    const categoryKeywords = {
-      "Video": ["video", "editing", "film", "youtube"],
-      "Image": ["gambar", "foto", "image", "picture", "drawing"],
-      "Audio": ["audio", "suara", "music", "musik", "lagu", "sound"],
-      "Text": ["text", "tulisan", "artikel", "tulis", "writing"],
-      "Coding": ["coding", "programming", "code", "kode", "developer"],
-      "Chat": ["chat", "conversation", "percakapan", "diskusi"],
-      "Education": ["education", "learning", "belajar", "pendidikan", "sekolah"]
-    };
-    
-    // Check for category keywords
-    for (const [cat, keywords] of Object.entries(categoryKeywords)) {
-      if (keywords.some(keyword => query_lower.includes(keyword))) {
-        category = cat;
-        break;
-      }
-    }
-    
-    // Common words to exclude from search (but don't exclude 'ai')
-    const excludeWords = [
+    // Common words to exclude (stop words)
+    const stopWords = [
       "saya", "ingin", "mencari", "yang", "untuk", "dengan", "dan", 
       "atau", "di", "ke", "dari", "cari", "tolong", "bantuan", "bagaimana",
       "carikan", "mau", "seperti", "mirip", "bagus", "terbaik", "gratis", "free",
-      "premium", "berbayar"
+      "premium", "berbayar", "a", "the", "an", "of", "in", "on", "at", "by",
+      "to", "for", "about", "is", "are", "was", "were", "be", "been", "being",
+      "have", "has", "had", "do", "does", "did", "akan", "sedang", "telah",
+      "sudah", "belum", "not", "no", "yes", "dapat", "bisa", "mampu", "ini", "itu"
+    ];
+
+    // Important terms and known AI tool names (these should always be included if present)
+    const importantTerms = [
+      "ai", "gpt", "chatgpt", "gpt-4", "claude", "bard", "gemini", "dall-e", 
+      "midjourney", "stable diffusion", "copilot", "assistant", "llm",
+      "bing", "google", "openai", "huggingface", "video", "audio", "image",
+      "gambar", "foto", "editing", "generator", "text", "tulisan", "code",
+      "kode", "programming", "coding", "machine learning", "ml", "nlp",
+      "suara", "musik", "lagu", "youtube", "conversation", "chat", "percakapan",
+      "education", "belajar", "learning", "pendidikan", "writing", "tulis"
     ];
     
-    // Extract significant terms
-    const knownAiTools = ["gpt", "chatgpt", "gpt-4", "claude", "bard", "gemini", "dall-e", 
-                          "midjourney", "stable diffusion", "copilot", "assistant", "llm",
-                          "bing", "google", "openai"];
+    // Split query into words
+    const words = query_lower.split(/\s+/);
     
-    let keywords: string[] = [];
-    
-    // First add known AI tools if present
-    for (const tool of knownAiTools) {
-      if (query_lower.includes(tool)) {
-        keywords.push(tool);
+    // Keep multi-word important terms intact (like "stable diffusion")
+    const processedWords = [...words];
+    for (const term of importantTerms) {
+      if (term.includes(" ") && query_lower.includes(term)) {
+        // Add the multi-word term
+        processedWords.push(term);
       }
     }
     
-    // Add other significant words from the query
-    const words = query_lower.split(/\s+/);
-    const filteredWords = words.filter(word => {
-      // Keep "ai" but filter out common words and short words
-      return (word === "ai" || (!excludeWords.includes(word) && word.length >= 3));
+    // Filter words: keep important terms and non-stop words with 3+ characters
+    const keywords = processedWords.filter(word => {
+      // Always keep important terms
+      if (importantTerms.includes(word)) return true;
+      
+      // Filter out stop words and short words
+      return !stopWords.includes(word) && word.length >= 3;
     });
     
-    // Add the category if detected
-    if (category && !keywords.includes(category.toLowerCase())) {
-      keywords.push(category.toLowerCase());
-    }
-    
-    // Combine all keywords, removing duplicates
-    keywords = [...new Set([...keywords, ...filteredWords])];
-    
-    // Ensure "ai" is included if the query is about AI
-    if (query_lower.includes("ai") && !keywords.includes("ai")) {
-      keywords.push("ai");
-    }
-    
-    return {
-      keywords,
-      category,
-    };
+    // Remove duplicates
+    return [...new Set(keywords)];
   };
 
   const handleSearch = () => {
@@ -87,27 +63,26 @@ const SearchPage: React.FC = () => {
     
     setIsSearching(true);
     
-    const { keywords, category } = processSearchQuery(searchQuery);
+    // Extract keywords Google-style
+    const keywords = extractKeywords(searchQuery);
     const params = new URLSearchParams();
     
-    // Add full query to help with context
+    // Store original query for context
     params.set("query", searchQuery);
     
-    // Add keywords as a combined search term
+    // Store extracted keywords for search
+    if (keywords.length > 0) {
+      params.set("keywords", keywords.join(","));
+    }
+    
+    // Store search terms for matching
     if (keywords.length > 0) {
       params.set("q", keywords.join(" "));
     }
     
-    // Add category if detected
-    if (category) {
-      params.set("category", category);
-    }
-    
-    // Log the search parameters for debugging
     console.log("Search parameters:", {
       fullQuery: searchQuery,
       keywords,
-      category,
       url: `/pages/ListAi?${params.toString()}`
     });
     
