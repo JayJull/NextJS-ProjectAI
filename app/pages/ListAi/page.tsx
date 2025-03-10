@@ -41,7 +41,7 @@ const List: React.FC = () => {
 
   // Results ref for scrolling
   const resultsRef = useRef<HTMLDivElement>(null);
-  
+
   // Initialize AOS
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -434,7 +434,7 @@ const List: React.FC = () => {
   // Load more function
   const loadMore = () => {
     setLoadingMore(true);
-    
+
     // Simulate network delay (remove in production)
     setTimeout(() => {
       const newVisibleCount = visibleCount + ITEMS_PER_LOAD;
@@ -637,7 +637,10 @@ const List: React.FC = () => {
         </div>
       </section>
 
-      <section>
+      <section
+        className="py-32 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-36"
+        ref={resultsRef}
+      >
         <div
           className="max-w-xl mx-auto"
           data-aos="fade-up"
@@ -762,19 +765,16 @@ const List: React.FC = () => {
             </div>
           </form>
         </div>
-      </section>
-
-      <section
-        className="py-32 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-36"
-        ref={resultsRef}
-      >
         <div className="mt-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
             <p className="text-black text-sm sm:text-base">
               Showing {visibleTools.length} of {filteredTools.length} results
-              {filteredTools.length > 0 && visibleTools.length < filteredTools.length 
-                ? ` (${filteredTools.length - visibleTools.length} more available)`
-                : ''}
+              {filteredTools.length > 0 &&
+              visibleTools.length < filteredTools.length
+                ? ` (${
+                    filteredTools.length - visibleTools.length
+                  } more available)`
+                : ""}
             </p>
           </div>
 
@@ -835,11 +835,13 @@ const List: React.FC = () => {
           )}
 
           {/* Shown All Message */}
-          {!hasMore && visibleTools.length > 0 && visibleTools.length === filteredTools.length && (
-            <div className="text-center mt-8 text-gray-600">
-              All results have been loaded
-            </div>
-          )}
+          {!hasMore &&
+            visibleTools.length > 0 &&
+            visibleTools.length === filteredTools.length && (
+              <div className="text-center mt-8 text-gray-600">
+                All results have been loaded
+              </div>
+            )}
         </div>
       </section>
     </Layout>
