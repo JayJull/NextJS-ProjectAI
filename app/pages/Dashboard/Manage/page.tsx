@@ -1,12 +1,17 @@
 "use client";
 import { Layout } from "@/app/components/Dashboard/Layout";
 import { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaFileImport, FaFileExport } from "react-icons/fa";
 import { deleteAi, getAi } from "@/lib/data";
 import AddDataModal from "./components/modalAdd";
 import UpdateDataModal from "./components/modalUpdate";
-import { FaFileImport } from "react-icons/fa";
 import ImportModal from "./components/modalImport";
+import DeleteConfirmationModal from "./components/modaDelete";
+import dynamic from "next/dynamic";
+
+const ExportModal = dynamic(() => import("./components/modalExport"), {
+  ssr: false,
+});
 
 interface Kategori {
   id: number;
@@ -35,6 +40,9 @@ const ProductTable = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditItem, setCurrentEditItem] = useState<AI | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{id: number, name: string} | null>(null);
 
   const fetchData = async () => {
     try {
@@ -89,13 +97,23 @@ const ProductTable = () => {
     setCurrentEditItem(null);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteClick = (id: number, name: string) => {
+    setItemToDelete({ id, name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    
     try {
-      await deleteAi(id);
-      setAis((prevAis) => prevAis.filter((item) => item.id !== id));
-      console.log("Item dengan id", id, "berhasil dihapus.");
+      await deleteAi(itemToDelete.id);
+      setAis((prevAis) => prevAis.filter((item) => item.id !== itemToDelete.id));
+      console.log("Item dengan id", itemToDelete.id, "berhasil dihapus.");
     } catch (error) {
       console.error("Terjadi kesalahan saat menghapus item:", error);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -125,20 +143,29 @@ const ProductTable = () => {
     <Layout>
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-          <button
-            onClick={handleOpenModal}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FaPlus className="text-sm" />
-            Tambah
-          </button>
-          <button
-            onClick={() => setIsImportModalOpen(true)}
-            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg -ml-80 mr-64 flex items-center gap-2"
-          >
-            <FaFileImport className="text-sm" />
-            Import
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleOpenModal}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaPlus className="text-sm" />
+              Tambah
+            </button>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaFileImport className="text-sm" />
+              Import
+            </button>
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <FaFileExport className="text-sm" />
+              Export
+            </button>
+          </div>
 
           <AddDataModal
             isOpen={isAddModalOpen}
@@ -150,6 +177,12 @@ const ProductTable = () => {
             isOpen={isImportModalOpen}
             onClose={() => setIsImportModalOpen(false)}
             onImportSuccess={fetchData}
+          />
+
+          <ExportModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            data={ais}
           />
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -214,7 +247,7 @@ const ProductTable = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => handleDeleteClick(item.id, item.name)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"
                       >
                         <FaTrash className="text-sm" />
@@ -267,6 +300,13 @@ const ProductTable = () => {
           currentData={currentEditItem}
         />
       )}
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={itemToDelete?.name || ""}
+      />
     </Layout>
   );
 };

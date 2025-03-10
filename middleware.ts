@@ -1,18 +1,26 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl
-  
-  if (url.pathname.startsWith('/aifree/')) {
-    // Ambil URL target dengan menghapus /aifree/
-    const targetUrl = url.pathname.replace('/aifree/', '')
+export async function middleware(request: NextRequest) {
+  // Check if this is a protected route
+  if (request.nextUrl.pathname.startsWith('/pages/Dashboard') || 
+      request.nextUrl.pathname.startsWith('/admin')) {
     
-    // Redirect ke URL asli dengan https
-    return NextResponse.redirect(`https://${targetUrl}`)
+    const sessionToken = request.cookies.get('sessionToken')?.value;
+    const userId = request.cookies.get('userId')?.value;
+    
+    // If no session token or user ID, redirect to homepage with loginModal=true
+    if (!sessionToken || !userId) {
+      // Store the intended URL to redirect back after login
+      const returnUrl = encodeURIComponent(request.nextUrl.pathname);
+      return NextResponse.redirect(new URL(`/pages/Homepage/?loginModal=true&returnUrl=${returnUrl}`, request.url));
+    }
   }
+
+  return NextResponse.next();
 }
 
+// Configure the middleware to run on specific paths
 export const config = {
-  matcher: '/aifree/:path*',
-}
+  matcher: ['/pages/Dashboard/:path*', '/admin/:path*'],
+};
