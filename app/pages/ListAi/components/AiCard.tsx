@@ -12,6 +12,8 @@ const AiCard: React.FC<AiCardProps> = ({
   url,
   shortLink,
 }) => {
+  const router = useRouter();
+
   const getDisplayLink = (shortLink?: string) => {
     if (shortLink) {
       return `/aff/${shortLink}`;
@@ -27,11 +29,7 @@ const AiCard: React.FC<AiCardProps> = ({
         console.error("Error tracking click:", error);
       }
     }
-  };
-
-  const handleDesc = async () => {
-    const Router = useRouter();
-    Router.push(`/pages/About/${shortLink}`);
+    window.open(getDisplayLink(shortLink), "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -73,26 +71,20 @@ const AiCard: React.FC<AiCardProps> = ({
               {shortDesc}
             </p>
             <div className="mt-3 flex justify-center sm:hidden">
-              <a
-                href={getDisplayLink(shortLink)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
                 onClick={handleClick}
                 className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded transition-colors w-full text-center"
               >
                 Visit Website
-              </a>
+              </button>
             </div>
           </div>
-          <a
-            href={getDisplayLink(shortLink)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
             onClick={handleClick}
-            className="hidden sm:block px-4 py-2 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded transition-colors whitespace-nowrap"
+            className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded transition-colors whitespace-nowrap"
           >
             Visit Website
-          </a>
+          </button>
         </div>
       </div>
     </Link>
