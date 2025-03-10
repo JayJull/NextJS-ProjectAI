@@ -36,7 +36,7 @@ const List: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string[]>([]);
   
-  const categoryKeywordMap = {
+  const categoryKeywordMap: { [key: string]: string[] } = {
     'ai_photos': ['photo', 'photos', 'image', 'images', 'gambar', 'foto', 'picture', 'visual'], 
     'ai_video': ['video', 'videos', 'film', 'movie', 'cinema', 'animation'], 
     'ai_audio': ['audio', 'sound', 'music', 'voice', 'speech', 'suara', 'musik', 'lagu'], 
