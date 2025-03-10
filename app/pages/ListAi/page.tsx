@@ -638,14 +638,6 @@ const List: React.FC = () => {
       </section>
 
       <section>
-        <h3
-          className="text-blue-600 text-center font-sans text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4"
-          data-aos="fade-up"
-          data-aos-delay="500"
-          data-aos-once="true"
-        >
-          Search AI
-        </h3>
         <div
           className="max-w-xl mx-auto"
           data-aos="fade-up"
