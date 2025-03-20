@@ -35,7 +35,6 @@ const List: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [keywords, setKeywords] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_LOAD);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
@@ -459,7 +458,6 @@ const List: React.FC = () => {
 
         // Parse keywords from comma-separated string
         const keywordArray = urlKeywords ? urlKeywords.split(",") : [];
-        setKeywords(keywordArray);
 
         // Update state with URL parameters
         setSearchQuery(urlQuery);
@@ -638,7 +636,7 @@ const List: React.FC = () => {
       </section>
 
       <section
-        className="py-32 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-36"
+        className="py-32 md:py-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-36"
         ref={resultsRef}
       >
         <div
