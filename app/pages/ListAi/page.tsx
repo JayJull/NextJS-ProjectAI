@@ -445,7 +445,6 @@ const List: React.FC = () => {
     }, 500);
   };
 
-  // Fetch AI tools and apply filters
   useEffect(() => {
     const fetchData = async () => {
       try {
