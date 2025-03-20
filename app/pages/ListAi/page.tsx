@@ -11,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
+import { PulseLoader } from "react-spinners";
 
 const ITEMS_PER_LOAD = 5; // Number of items to load at once
 
@@ -604,6 +605,15 @@ const List: React.FC = () => {
 
     Router.push(`/pages/ListAi?${params.toString()}`);
   };
+
+  if (loading) {
+      return (
+        <div className="flex flex-col justify-center items-center h-screen bg-gray-900">
+          <PulseLoader color="#ffffff" size={15} />
+          <p className="mt-4 text-white text-lg font-semibold">Loading...</p>
+        </div>
+      );
+    }
 
   return (
     <Layout>

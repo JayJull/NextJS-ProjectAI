@@ -1,8 +1,8 @@
 import React from "react";
 import { AiCardProps } from "@/app/data/ai-card";
 import { incrementClick } from "@/lib/data";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const AiCard: React.FC<AiCardProps> = ({
   logo,
@@ -12,7 +12,6 @@ const AiCard: React.FC<AiCardProps> = ({
   url,
   shortLink,
 }) => {
-  const router = useRouter();
 
   const getDisplayLink = (shortLink?: string) => {
     if (shortLink) {
@@ -37,11 +36,13 @@ const AiCard: React.FC<AiCardProps> = ({
       <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex flex-col sm:flex-row items-start gap-3 md:gap-4">
           <div className="w-12 h-12 flex-shrink-0 mx-auto sm:mx-0">
-            <img
+            <Image
               src={logo}
               alt={name}
               className="w-full h-full rounded-lg object-cover"
-            />
+              width={100}
+              height={100}
+              />
           </div>
           <div className="flex-1 w-full">
             <div className="flex items-center justify-center sm:justify-start gap-2">

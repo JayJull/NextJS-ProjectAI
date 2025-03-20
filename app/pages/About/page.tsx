@@ -121,7 +121,7 @@ const AboutPage = () => {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:mt-40">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.id} className="text-center" data-aos="fade-up">
@@ -204,7 +204,7 @@ const AboutPage = () => {
             Want to Learn More?
           </h2>
           <p className="text-lg sm:text-xl text-blue-200 mb-8">
-            We're always happy to hear from you. Reach out to our team with any
+            We&apos;re always happy to hear from you. Reach out to our team with any
             questions.
           </p>
           <button
@@ -234,9 +234,11 @@ const AboutPage = () => {
                     key={logo.id}
                     className="flex items-center justify-center mx-4 sm:mx-6 md:mx-8 min-w-[100px] sm:min-w-[140px] md:min-w-[180px]"
                   >
-                    <img
+                    <Image
                       src={logo.src}
                       alt={logo.alt}
+                      width={100}
+                      height={20}
                       className="h-8 sm:h-10 md:h-12 w-auto object-contain"
                     />
                   </div>
@@ -248,9 +250,11 @@ const AboutPage = () => {
                     key={`${logo.id}-duplicate`}
                     className="flex items-center justify-center mx-4 sm:mx-6 md:mx-8 min-w-[100px] sm:min-w-[140px] md:min-w-[180px]"
                   >
-                    <img
+                    <Image
                       src={logo.src}
                       alt={logo.alt}
+                      width={100}
+                      height={20}
                       className="h-8 sm:h-10 md:h-12 w-auto object-contain"
                     />
                   </div>

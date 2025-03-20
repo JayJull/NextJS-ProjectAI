@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 const SearchPage: React.FC = () => {
+  
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const router = useRouter();
@@ -63,6 +65,7 @@ const SearchPage: React.FC = () => {
     
     setIsSearching(true);
     
+    
     // Extract keywords Google-style
     const keywords = extractKeywords(searchQuery);
     const params = new URLSearchParams();
@@ -109,6 +112,8 @@ const SearchPage: React.FC = () => {
     "AI coding assistant",
     "AI untuk edit musik"
   ];
+
+ 
 
   return (
     <div
